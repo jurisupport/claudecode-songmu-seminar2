@@ -13,6 +13,18 @@
 
 > ⚠️ 실습사건은 강의용 **가상사건**(김민철 vs 이정숙, 대여금)입니다. 인적사항·금액·계좌·사건번호는 모두 허구이며 실재 인물·사건과 무관합니다.
 
+## 🛠️ 처음이신 분 — 설치 확인 (Claude Code + 플러그인)
+
+실습하려면 **Claude Code**와 **jurisupport-plugins**가 설치돼 있어야 합니다. 아래 한 줄을 터미널에 붙여넣으면 설치 여부를 확인하고, **안 돼 있으면 설치할지 물어봅니다.**
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.sh)
+```
+
+- 이미 다 설치돼 있으면 "준비 완료"가 뜹니다 → 바로 아래 **받는 법**으로.
+- 설치 안내·수동 설치: **https://github.com/jurisupport/jurisupport-plugins**
+- Windows(WSL 미사용) 분은 위 링크의 `WINDOWS_WSL` 가이드를 참고하세요.
+
 ## ⬇️ 받는 법
 
 ### 방법 A — 터미널 한 줄 (git 설치 필요 없음 · 권장)
