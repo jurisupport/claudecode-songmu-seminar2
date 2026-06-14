@@ -42,11 +42,13 @@ irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/mai
 cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "완료 → ~/Downloads/클로드코드2차자료"
 ```
 
-**Windows** (PowerShell) — `다운로드\클로드코드2차자료`에 받아집니다:
+**Windows** (PowerShell, Win10/11) — `다운로드\클로드코드2차자료`에 받아집니다:
 
 ```powershell
-cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드코드2차자료 -Recurse -Force }; iwr https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.zip -OutFile cc2.zip; Expand-Archive cc2.zip -DestinationPath . -Force; Remove-Item cc2.zip; Rename-Item claudecode-songmu-seminar2-main 클로드코드2차자료; "완료 -> $HOME\Downloads\클로드코드2차자료"
+cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드코드2차자료 -Recurse -Force }; curl.exe -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz -o cc2.tgz; tar -xf cc2.tgz; Remove-Item cc2.tgz; Rename-Item claudecode-songmu-seminar2-main 클로드코드2차자료; "완료 -> $HOME\Downloads\클로드코드2차자료"
 ```
+
+> `curl.exe`·`tar`는 Windows 10/11에 기본 내장입니다. (`Expand-Archive`는 한글 폴더명이 깨질 수 있어 `tar`를 씁니다.)
 
 실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
 

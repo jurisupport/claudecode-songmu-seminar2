@@ -1,6 +1,8 @@
 # 클로드코드 + jurisupport-plugins 설치 확인 (Windows PowerShell)
 # 사용:  irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex
 
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+
 $bootstrap = 'https://raw.githubusercontent.com/jurisupport/jurisupport-plugins/main/windows-bootstrap.ps1'
 $guide     = 'https://github.com/jurisupport/jurisupport-plugins'
 
