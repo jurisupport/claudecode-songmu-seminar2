@@ -34,20 +34,21 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songm
 
 ## ⬇️ 받는 법
 
-### 방법 A — 한 줄로 받기 (git 불필요 · 권장)
+### 방법 A — 한 줄로 받기 (권장)
 
-**Windows** (PowerShell, Win10/11) — `다운로드\클로드코드2차자료`에 받아집니다:
+> 받기에 `git`을 씁니다. 위 **설치 확인**에서 플러그인을 설치하셨으면 git도 함께 깔려 있습니다.
+> (압축파일 받기는 Windows에서 한글 폴더명이 깨지므로 `git`을 씁니다.)
+
+**Windows** (PowerShell) — `다운로드\클로드코드2차자료`에 받아집니다:
 
 ```powershell
-cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드코드2차자료 -Recurse -Force }; curl.exe -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz -o cc2.tgz; tar -xf cc2.tgz; Remove-Item cc2.tgz; Rename-Item claudecode-songmu-seminar2-main 클로드코드2차자료; "완료 -> $HOME\Downloads\클로드코드2차자료"
+cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드코드2차자료 -Recurse -Force }; git clone https://github.com/jurisupport/claudecode-songmu-seminar2.git 클로드코드2차자료
 ```
-
-> `curl.exe`·`tar`는 Windows 10/11에 기본 내장입니다. (`Expand-Archive`는 한글 폴더명이 깨질 수 있어 `tar`를 씁니다.)
 
 **macOS · Linux** (터미널) — `~/Downloads/클로드코드2차자료`에 받아집니다:
 
 ```bash
-cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "완료 → ~/Downloads/클로드코드2차자료"
+cd ~/Downloads && rm -rf 클로드코드2차자료 && git clone https://github.com/jurisupport/claudecode-songmu-seminar2.git 클로드코드2차자료
 ```
 
 실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
@@ -62,11 +63,11 @@ cd ~\Downloads\클로드코드2차자료\실습사건_세션1_대여금; claude
 cd ~/Downloads/클로드코드2차자료/실습사건_세션1_대여금 && claude
 ```
 
-### 방법 B — 클릭으로 (OS 무관)
+### 방법 B — 클릭으로 (슬라이드·핸드아웃만 볼 때)
 
 1. 이 페이지 위쪽 초록색 **`Code`** 버튼 → **`Download ZIP`** → 압축 풀기
-2. 핸드아웃 2개는 `.html` 파일을 **더블클릭**해서 브라우저로 엽니다 (명령마다 복사 버튼)
-3. 실습은 `실습사건_세션1_대여금` 폴더를 통째로 쓰면 됩니다
+2. 핸드아웃 `.html`은 **더블클릭**해서 브라우저로 열기 · 슬라이드 PDF도 바로 열림
+3. ⚠️ Windows에서 ZIP을 풀면 **한글 폴더명이 깨질 수 있습니다.** 사건폴더에서 `claude`를 돌리는 **실습은 방법 A(git clone)**를 쓰세요.
 
 ## 🚀 실습 순서 (핸드아웃 요약)
 
