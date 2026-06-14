@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>강의 내용 핸드아웃 · 클로드코드 2차</title>
+<style>
+  :root{
+    --blue:#2563EB; --blue-d:#1d4ed8; --ink:#1f2937; --muted:#6b7280;
+    --bg:#f6f7f9; --card:#ffffff; --line:#e5e7eb; --code-bg:#0f172a; --code-ink:#e2e8f0;
+    --ok:#16a34a;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    line-height:1.65; font-size:17px;}
+  .wrap{max-width:820px; margin:0 auto; padding:24px 18px 80px}
+  header.top{background:linear-gradient(135deg,var(--blue),#3b82f6); color:#fff;
+    border-radius:16px; padding:24px 22px; margin-bottom:18px;}
+  header.top h1{margin:0 0 6px; font-size:24px; letter-spacing:-.3px}
+  header.top p{margin:2px 0; opacity:.95; font-size:15px}
+  .howto{background:#eef2ff; border:1px solid #c7d2fe; border-radius:12px;
+    padding:14px 16px; margin-bottom:18px; font-size:15px;}
+  .howto b{color:var(--blue-d)}
+  h2.sec{font-size:19px; margin:32px 0 6px; padding-top:10px;
+    border-top:3px solid var(--blue); display:flex; align-items:center; gap:8px;}
+  .sec-desc{color:var(--muted); font-size:14.5px; margin:2px 0 14px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:16px 16px 14px; margin:14px 0; box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .card.do{border-left:5px solid var(--blue)}
+  .card .label{display:inline-flex; align-items:center; gap:7px; font-weight:700;
+    font-size:15.5px; margin-bottom:4px; flex-wrap:wrap;}
+  .card .hint{color:var(--muted); font-size:14px; margin:2px 0 10px}
+  .num{display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:26px;
+    background:var(--blue); color:#fff; border-radius:50%; font-size:14px; font-weight:700}
+  /* 원칙 카드 */
+  .principle{background:var(--card); border:1px solid var(--line); border-left:5px solid var(--blue);
+    border-radius:12px; padding:13px 15px; margin:10px 0}
+  .principle b{color:var(--blue-d); font-size:16px}
+  .principle .why{color:#334155; font-size:14.5px; margin:3px 0 6px}
+  .principle .ex{font-size:14px; background:#f8fafc; border:1px solid var(--line);
+    border-radius:8px; padding:8px 11px}
+  .principle .ex .bad{color:#b91c1c} .principle .ex .good{color:#047857}
+  /* triage */
+  .triage{background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:14px 18px; margin:12px 0}
+  .triage ol{margin:6px 0; padding-left:22px} .triage li{margin:5px 0; font-size:14.8px}
+  .warn{background:#fffbeb; border:1px solid #fcd34d; border-radius:10px;
+    padding:10px 14px; margin-top:10px; font-size:14px; color:#7c2d12}
+  .realcase{background:#fef2f2; border:1px solid #fecaca; border-radius:12px;
+    padding:14px 16px; margin:14px 0; font-size:14.5px; color:#7f1d1d}
+  .realcase b{color:#b91c1c}
+  pre{background:var(--code-bg); color:var(--code-ink); border-radius:10px;
+    padding:13px 13px; margin:0; overflow-x:auto; font-size:14.5px; line-height:1.55;
+    white-space:pre-wrap; word-break:break-word;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,"D2Coding",monospace;}
+  .copybtn{margin-top:9px; width:100%; border:none; cursor:pointer; background:var(--blue);
+    color:#fff; font-weight:700; font-size:14.5px; padding:10px; border-radius:9px;
+    transition:background .15s; font-family:inherit;}
+  .copybtn:hover{background:var(--blue-d)} .copybtn.copied{background:var(--ok)}
+  .oneline{background:var(--blue); color:#fff; border-radius:12px; padding:14px 16px;
+    font-weight:700; text-align:center; margin:18px 0 6px; font-size:16px}
+  table{width:100%; border-collapse:collapse; margin:8px 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+  th{background:#f1f5f9}
+  code{background:#eef2f7; padding:1px 6px; border-radius:5px; font-size:14px}
+  footer{margin-top:36px; text-align:center; color:var(--muted); font-size:13.5px}
+  @media (max-width:480px){ body{font-size:16px} .wrap{padding:16px 12px 70px} header.top h1{font-size:21px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>강의 내용 핸드아웃</h1>
+    <p>클로드코드 2차 — 수업 요약 &amp; 집에서 쓰는 레퍼런스</p>
+    <p>2026. 6. 15. · 하희봉 변호사</p>
+  </header>
+
+  <div class="howto">
+    📌 오늘 배운 <b>원칙과 도구</b>를 한 장에 담았습니다. 실제 명령 따라하기는 <b>「실습 명령어 핸드아웃」</b>을, 개념·언제 뭘 쓰는지는 이 문서를 보세요. 예시 명령은 <b>[복사]</b>해서 바로 쓸 수 있습니다.
+  </div>
+
+  <!-- ===== 한 장 요약 ===== -->
+  <h2 class="sec">📋 오늘 한 장 요약</h2>
+  <div class="card">
+    <table>
+      <tr><th>주제</th><th>핵심</th></tr>
+      <tr><td>① 잘 명령하는 법</td><td>맥락 + 입장 + 형식. 단계로 나누고, 틀리면 되묻는다</td></tr>
+      <tr><td>② plugins</td><td>사건폴더를 통째로 읽힌다 — 업로드 불필요(웹 Claude와 차이)</td></tr>
+      <tr><td>③ legal-books</td><td>저작권 청정 자료로 내 서재. 교과서는 인용 아닌 <b>검증용</b></td></tr>
+      <tr><td>④ jurisupport</td><td>파일은 OneDrive, 상태·기일·할일은 사건관리 도구로 분담</td></tr>
+      <tr><td>⑤ 준비서면</td><td>법령·판례 → 초안 → <b>검증</b>. 초안은 AI, 검증은 변호사</td></tr>
+    </table>
+  </div>
+
+  <!-- ===== 0. 웹 클로드와 차이 ===== -->
+  <h2 class="sec">0. 이 도구가 웹 클로드와 뭐가 다른가</h2>
+  <p class="sec-desc">도구가 여러 개지만 입구는 하나 — 터미널의 클로드 한 곳에서 전부 연결됩니다.</p>
+  <div class="card">
+    <div class="label">🧩 하나의 클로드 안에 붙은 도구들</div>
+    <table>
+      <tr><th>도구</th><th>역할</th></tr>
+      <tr><td>legal-terminal</td><td>사건폴더·zip 통째로 읽고 작업</td></tr>
+      <tr><td>legal-books</td><td>저작권 청정 자료로 만든 내 서재(검증용)</td></tr>
+      <tr><td>korean-law · 법고을</td><td>법령 조문 원문 · 판례 검색</td></tr>
+      <tr><td>jurisupport</td><td>사건 상태·기일·증거·할일 관리</td></tr>
+      <tr><td>brief-protocol</td><td>준비서면 단계 오케스트레이션</td></tr>
+    </table>
+    <div class="hint">→ 전부 <b>하나의 클로드</b> 안에서 연결됩니다. 도구가 많아 보여도 쓰는 입구는 터미널 한 곳뿐.</div>
+  </div>
+  <div class="principle"><b>📂 13개 파일을 안 올렸는데 다 읽는다</b>
+    <div class="why">웹 클로드는 파일을 일일이 업로드해야 합니다. 여기선 사건폴더만 가리키면 알아서 전부 읽습니다 — 이게 결정적 차이.</div>
+    <div class="ex"><span class="bad">웹 Claude</span> 파일 하나씩 업로드 · 13개면 13번<br><span class="good">legal-terminal</span> 폴더만 가리키면 13개 통째로 + 법령·판례·과거 사건까지 연결</div>
+  </div>
+  <div class="card">
+    <div class="label">💬 "코웍(Cowork) 쓰면 되지 않나?"</div>
+    <div class="hint">Cowork도 로컬 파일은 읽지만 Max 전용·research preview·비개발자용 단순 UI입니다. MCP 연동(법령·판례)·skills·멀티세션 병렬·brief-protocol 오케스트레이션은 클로드코드(legal-terminal) 영역.</div>
+  </div>
+  <div class="card">
+    <div class="label">🪟 여러 사건도 동시에</div>
+    <div class="hint">창을 여러 개 띄우면 사건도 여러 건 동시에 굴러갑니다. 혼자 하면 반나절씩 걸릴 일을 병렬로.</div>
+  </div>
+
+  <!-- ===== 잘 시키는 5원칙 ===== -->
+  <h2 class="sec">1. 잘 시키는 5원칙</h2>
+  <p class="sec-desc">결과가 안 좋으면 십중팔구 명령이 부실해서입니다. 송무 지시서 쓰듯 시키세요.</p>
+
+  <div class="principle"><b>① 맥락을 먼저</b>
+    <div class="why">모델은 내 사건을 모릅니다. 맥락이 없으면 일반론·환각으로 메웁니다.</div>
+    <div class="ex"><span class="bad">✗ "대여금 답변서 써줘"</span> → 교과서 템플릿<br><span class="good">✓ 사건폴더를 읽히고 "이 사건 기준으로"</span> → 그 사건 답변서</div>
+  </div>
+  <div class="principle"><b>② 역할·입장 지정</b>
+    <div class="why">같은 사실도 입장 따라 강조점이 달라집니다.</div>
+    <div class="ex"><span class="good">✓ "원고(임차인) 대리인 입장에서"</span> — 안 주면 어정쩡한 중립 글</div>
+  </div>
+  <div class="principle"><b>③ 산출물 형식 명시</b>
+    <div class="why">표·항·분량·저장파일을 못박으면 매번 같은 결과(재현성↑).</div>
+    <div class="ex"><span class="good">✓ "호증번호/서증명/입증취지/작성일 열로 표"</span> → 증거설명서에 바로 붙음</div>
+  </div>
+  <div class="principle"><b>④ 한 번에 다 말고 단계로</b>
+    <div class="why">작업을 쪼개면 단계별 정확도가 오르고, 중간에 교정할 수 있습니다.</div>
+    <div class="ex"><span class="good">✓ 쟁점 추출 → 목차 → 초안</span> — "준비서면 다 써줘"보다 안전</div>
+  </div>
+  <div class="principle"><b>⑤ 틀리면 되물어라</b>
+    <div class="why">모델은 추론을 설명·수정할 수 있습니다. 단, <b>최종 검증 책임은 변호사.</b></div>
+    <div class="ex"><span class="good">✓ "이 인용 출처 표시하고, 불확실하면 표시해"</span></div>
+  </div>
+  <div class="principle"><b>⚖️ 나쁜 명령 → 좋은 명령 (Before / After)</b>
+    <div class="ex" style="margin-top:6px"><span class="bad">✗ "이 사건 답변서 써줘"</span><br>맥락·입장·형식이 다 빠짐 → 일반 템플릿</div>
+    <div class="ex" style="margin-top:6px"><span class="good">✓ "이 폴더(차용증·문자·입금내역) 다 읽고 · 피고 대리인 입장에서 · 변제·소멸시효 항변 중심으로 · 쟁점별 항 나눠 1~2페이지, 답변서.md로 저장"</span><br>맥락 + 입장 + 형식을 다 박음 → 그 사건 답변서</div>
+  </div>
+  <div class="oneline">좋은 명령 = 맥락 + 입장 + 형식 · 나머지는 대화로 교정</div>
+
+  <!-- ===== 업무별 각론 ===== -->
+  <h2 class="sec">2. 업무별 '잘 시키는 법' (도구 × 예시 명령)</h2>
+  <p class="sec-desc">우리 사무소에 깔린 도구를 업무에 1:1로 붙인 것입니다. 예시 명령은 복사해서 바로.</p>
+
+  <div class="card do">
+    <div class="label"><span class="num">1</span> 사건 파악 — legal-terminal(폴더 통째)</div>
+    <pre>이 사건폴더 전부 읽고 ① 사실관계 시간순 표, ② 쟁점 목록,
+③ 우리(피고)에게 불리한 점 순으로 정리해줘.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">2</span> 법령 조사 — korean-law(조문 원문)</div>
+    <pre>주택임대차보호법 제6조의3 현행 조문 원문과
+직전 개정 전 조문을 표로 대비해줘.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">3</span> 판례 검색 — 법고을(무료)·lbox(유료 직접)</div>
+    <pre>임차인 원상회복의무 범위에 관한 대법원 판결을 법고을에서 찾아
+사건번호·선고일·판시사항을 표로, 출처 URL까지.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    <div class="hint">※ 판결번호는 1차 후보일 뿐 — 인용 전 반드시 진본 확인.</div>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">4</span> 내 판단 검증 — legal-books(교과서 대조)</div>
+    <pre>'일부변제는 채무 전부의 묵시적 승인으로 시효가 중단된다'는
+내 판단이 통설·판례와 맞는지 legal-books에서 대조하고,
+어긋나거나 예외가 있는 부분만 짚어줘.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">5</span> 과거 사건 참고 — case-records</div>
+    <pre>유사한 대여금 사건에서 우리가 변제·시효 항변을 어떻게 구성했는지,
+법원이 어떻게 판단했는지 과거 기록에서 찾아줘.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">6</span> 준비서면 — brief-protocol(단계)</div>
+    <pre>brief-protocol로 진행 — 쟁점 추출 → 법령(korean-law)·판례(법고을)
+→ 목차 승인받고 → 초안. 각 단계 끝나면 멈추고 확인받아.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">7</span> 제출 전 자기검증 — mock-hearing</div>
+    <pre>이 준비서면 초안을 상대방 대리인·재판부 관점에서 공격해줘.
+가장 약한 전제부터 순서대로, 보강 과제까지.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+  </div>
+  <div class="card do">
+    <div class="label"><span class="num">8</span> 사건관리·기일 — JuriSupport / hearing-check</div>
+    <pre>2주 이내 기일이 있는 사건과 미완료 할일을 마감 임박순으로 표로 정리해줘.</pre>
+    <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    <div class="hint">※ 파일은 OneDrive, 상태·기일·할일은 JuriSupport로 역할분담. JuriSupport 없이 <b>CSV 한 파일</b>로도 관리 가능(songmu-legal case-index).</div>
+  </div>
+
+  <!-- ===== 저작권 triage ===== -->
+  <h2 class="sec">3. 내 법률 서재(legal-books) — 무엇을 넣어도 되나</h2>
+  <div class="triage">
+    <ol>
+      <li><b>판례·결정문 전문</b> (저작권법 §7 3호 보호 제외) — 가장 안전</li>
+      <li><b>법령·행정규칙 전문</b> (§7 1·2호)</li>
+      <li><b>공공기관 무료 해설·실무자료</b> (공공저작물 자유이용 §24-2)</li>
+      <li><b>변호사 본인 저작물</b>(서면·메모·블로그) — 가장 깨끗 + 사무소 노하우 누적</li>
+      <li><b>CC 라이선스·저작권 만료 고전</b></li>
+    </ol>
+    <div class="warn">⚠️ 상용 교과서·단행본 — <b>본인 업무용 참고·검색은 가능</b>하지만, DB(복제물)를 <b>남에게 배포·공유하는 것은 위험.</b> (개인 이용 ≠ 배포)</div>
+  </div>
+  <!-- ===== 검증은 변호사 ===== -->
+  <h2 class="sec">4. 검증은 변호사 (가장 중요)</h2>
+  <p class="sec-desc">AI의 가장 큰 위험은 <b>그럴듯한 가짜 판결번호(환각)</b>입니다. 제출 전 반드시:</p>
+  <div class="card">
+    <ol style="padding-left:20px; margin:6px 0">
+      <li>인용 판결번호 실존 확인 — 법고을 / lbox에서 직접 검색</li>
+      <li>직접인용("…")은 원문과 글자 단위 대조</li>
+      <li>법령 조문번호는 korean-law / law.go.kr로 재확인</li>
+    </ol>
+  </div>
+  <div class="realcase">
+    ⚡ <b>실제 사례</b> — 2025. 7. 24. 대법원 전원합의체(2023다240299)가 <b>"시효완성 후 채무승인 = 시효이익 포기 추정"</b>이라는 수십 년 된 법리를 <b>폐기</b>했습니다(이제 개별 의사해석). AI 학습데이터엔 옛 법리가 더 깔려 있을 수 있어, 그대로 받아쓰면 <b>폐기된 법리로 서면을 씁니다.</b> → 현행 판결을 직접 확인하고 검증하세요.
+  </div>
+  <div class="oneline">초안은 AI, 검증은 변호사</div>
+
+  <footer>
+    클로드코드로 송무하기 · 쥬리서포트 · 2026.06.15<br>
+    질문은 단톡방으로 🙋
+  </footer>
+
+</div>
+
+<script>
+function copyCmd(btn){
+  var pre = btn.parentNode.querySelector('pre');
+  var text = pre.innerText;
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = '✓ 복사됨!'; btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('copied'); }, 1400);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(text, done); });
+  } else { fallback(text, done); }
+}
+function fallback(text, done){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ alert('복사 실패 — 길게 눌러 직접 복사하세요'); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
