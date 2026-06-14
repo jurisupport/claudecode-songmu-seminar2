@@ -15,33 +15,52 @@
 
 ## 🛠️ 처음이신 분 — 설치 확인 (Claude Code + 플러그인)
 
-실습하려면 **Claude Code**와 **jurisupport-plugins**가 설치돼 있어야 합니다. 아래 한 줄을 터미널에 붙여넣으면 설치 여부를 확인하고, **안 돼 있으면 설치할지 물어봅니다.**
+실습하려면 **Claude Code**와 **jurisupport-plugins**가 설치돼 있어야 합니다. 아래를 붙여넣으면 설치 여부를 확인하고, **안 돼 있으면 설치할지 물어봅니다.**
+
+**macOS · Linux** — 터미널에:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.sh)
 ```
 
+**Windows** — PowerShell에:
+
+```powershell
+irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex
+```
+
 - 이미 다 설치돼 있으면 "준비 완료"가 뜹니다 → 바로 아래 **받는 법**으로.
 - 설치 안내·수동 설치: **https://github.com/jurisupport/jurisupport-plugins**
-- Windows(WSL 미사용) 분은 위 링크의 `WINDOWS_WSL` 가이드를 참고하세요.
 
 ## ⬇️ 받는 법
 
-### 방법 A — 터미널 한 줄 (git 설치 필요 없음 · 권장)
+### 방법 A — 한 줄로 받기 (git 불필요 · 권장)
 
-아래를 터미널에 붙여넣으면 `~/Downloads/클로드코드2차자료`에 전부 받아집니다.
+**macOS · Linux** (터미널) — `~/Downloads/클로드코드2차자료`에 받아집니다:
 
 ```bash
-cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "✅ 완료 → ~/Downloads/클로드코드2차자료"
+cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "완료 → ~/Downloads/클로드코드2차자료"
+```
+
+**Windows** (PowerShell) — `다운로드\클로드코드2차자료`에 받아집니다:
+
+```powershell
+cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드코드2차자료 -Recurse -Force }; iwr https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.zip -OutFile cc2.zip; Expand-Archive cc2.zip -DestinationPath . -Force; Remove-Item cc2.zip; Rename-Item claudecode-songmu-seminar2-main 클로드코드2차자료; "완료 -> $HOME\Downloads\클로드코드2차자료"
 ```
 
 실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
 
 ```bash
+# macOS · Linux
 cd ~/Downloads/클로드코드2차자료/실습사건_세션1_대여금 && claude
 ```
 
-### 방법 B — 클릭으로
+```powershell
+# Windows (PowerShell)
+cd ~\Downloads\클로드코드2차자료\실습사건_세션1_대여금; claude
+```
+
+### 방법 B — 클릭으로 (OS 무관)
 
 1. 이 페이지 위쪽 초록색 **`Code`** 버튼 → **`Download ZIP`** → 압축 풀기
 2. 핸드아웃 2개는 `.html` 파일을 **더블클릭**해서 브라우저로 엽니다 (명령마다 복사 버튼)

@@ -40,8 +40,7 @@ fi
 
 echo "  설치 안내:  $GUIDE"
 echo
-echo "  ※ Windows(WSL 미사용) 분은 위 링크의 WINDOWS_WSL 가이드를 참고하세요."
-echo "    이 자동 설치는 macOS / Linux / WSL 기준입니다."
+echo "  (이 스크립트는 macOS / Linux 용입니다. Windows는 PowerShell 버전을 쓰세요.)"
 echo
 
 printf "  지금 자동 설치를 진행할까요? (y/N) "
