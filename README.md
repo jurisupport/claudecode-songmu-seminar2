@@ -15,6 +15,18 @@
 
 ## ⬇️ 받는 법
 
+### 방법 A — 터미널 한 줄 (git 설치 필요 없음 · 권장)
+
+아래를 터미널에 그대로 붙여넣으면, `~/Downloads/클로드코드2차자료`에 전부 받고 **실습폴더에서 클로드까지 바로 켜집니다.**
+
+```bash
+cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && cd 클로드코드2차자료/실습사건_세션1_대여금 && claude
+```
+
+> 받기만 하고 클로드는 나중에 켜려면, 맨 끝 `&& cd ... && claude` 부분만 빼면 됩니다.
+
+### 방법 B — 클릭으로
+
 1. 이 페이지 위쪽 초록색 **`Code`** 버튼 → **`Download ZIP`** → 압축 풀기
 2. 핸드아웃 2개는 `.html` 파일을 **더블클릭**해서 브라우저로 엽니다 (명령마다 복사 버튼)
 3. 실습은 `실습사건_세션1_대여금` 폴더를 통째로 쓰면 됩니다
