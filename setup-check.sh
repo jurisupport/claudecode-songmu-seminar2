@@ -61,6 +61,9 @@ if get_materials; then
   echo
   echo "  완료 → $DEST"
   echo "  실습을 시작하려면:  cd \"$DEST/실습사건_세션1_대여금\" && claude"
+  # 받은 폴더 열기 (mac: open, linux: xdg-open)
+  if command -v open >/dev/null 2>&1; then open "$DEST" >/dev/null 2>&1
+  elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$DEST" >/dev/null 2>&1; fi
 else
   echo
   echo "  자료를 받지 못했습니다. 새 터미널에서 아래를 다시 실행하세요:"

@@ -60,6 +60,8 @@ if (Get-Materials) {
   Write-Host ""
   Write-Host "  실습을 시작하려면 아래를 붙여넣으세요:"
   Write-Host "      cd `"$dest\실습사건_세션1_대여금`"; claude"
+  # 받은 폴더를 탐색기로 열기
+  try { Start-Process explorer.exe -ArgumentList $dest } catch {}
 } else {
   Write-Host ""
   Write-Host "  자료를 받으려면 git이 필요합니다. (방금 설치하셨다면 PATH 적용을 위해)"
