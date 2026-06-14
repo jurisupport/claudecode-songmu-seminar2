@@ -17,16 +17,16 @@
 
 실습하려면 **Claude Code**와 **jurisupport-plugins**가 설치돼 있어야 합니다. 아래를 붙여넣으면 설치 여부를 확인하고, **안 돼 있으면 설치할지 물어봅니다.**
 
-**macOS · Linux** — 터미널에:
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.sh)
-```
-
 **Windows** — PowerShell에:
 
 ```powershell
 irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex
+```
+
+**macOS · Linux** — 터미널에:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.sh)
 ```
 
 - 이미 다 설치돼 있으면 "준비 완료"가 뜹니다 → 바로 아래 **받는 법**으로.
@@ -36,12 +36,6 @@ irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/mai
 
 ### 방법 A — 한 줄로 받기 (git 불필요 · 권장)
 
-**macOS · Linux** (터미널) — `~/Downloads/클로드코드2차자료`에 받아집니다:
-
-```bash
-cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "완료 → ~/Downloads/클로드코드2차자료"
-```
-
 **Windows** (PowerShell, Win10/11) — `다운로드\클로드코드2차자료`에 받아집니다:
 
 ```powershell
@@ -50,16 +44,22 @@ cd ~\Downloads; if (Test-Path 클로드코드2차자료) { Remove-Item 클로드
 
 > `curl.exe`·`tar`는 Windows 10/11에 기본 내장입니다. (`Expand-Archive`는 한글 폴더명이 깨질 수 있어 `tar`를 씁니다.)
 
-실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
+**macOS · Linux** (터미널) — `~/Downloads/클로드코드2차자료`에 받아집니다:
 
 ```bash
-# macOS · Linux
-cd ~/Downloads/클로드코드2차자료/실습사건_세션1_대여금 && claude
+cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "완료 → ~/Downloads/클로드코드2차자료"
 ```
+
+실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
 
 ```powershell
 # Windows (PowerShell)
 cd ~\Downloads\클로드코드2차자료\실습사건_세션1_대여금; claude
+```
+
+```bash
+# macOS · Linux
+cd ~/Downloads/클로드코드2차자료/실습사건_세션1_대여금 && claude
 ```
 
 ### 방법 B — 클릭으로 (OS 무관)
