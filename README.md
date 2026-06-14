@@ -17,13 +17,17 @@
 
 ### 방법 A — 터미널 한 줄 (git 설치 필요 없음 · 권장)
 
-아래를 터미널에 그대로 붙여넣으면, `~/Downloads/클로드코드2차자료`에 전부 받고 **실습폴더에서 클로드까지 바로 켜집니다.**
+아래를 터미널에 붙여넣으면 `~/Downloads/클로드코드2차자료`에 전부 받아집니다.
 
 ```bash
-cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && cd 클로드코드2차자료/실습사건_세션1_대여금 && claude
+cd ~/Downloads && rm -rf 클로드코드2차자료 && curl -L https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.tar.gz | tar xz && mv claudecode-songmu-seminar2-main 클로드코드2차자료 && echo "✅ 완료 → ~/Downloads/클로드코드2차자료"
 ```
 
-> 받기만 하고 클로드는 나중에 켜려면, 맨 끝 `&& cd ... && claude` 부분만 빼면 됩니다.
+실습을 시작할 때는, 사건 폴더로 들어가 클로드를 켭니다.
+
+```bash
+cd ~/Downloads/클로드코드2차자료/실습사건_세션1_대여금 && claude
+```
 
 ### 방법 B — 클릭으로
 
