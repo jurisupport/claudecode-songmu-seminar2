@@ -4,7 +4,7 @@
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
 $bootstrap = 'https://raw.githubusercontent.com/jurisupport/jurisupport-plugins/main/windows-bootstrap.ps1'
-$legalTerminalInstaller = 'https://raw.githubusercontent.com/jurisupport/legal-terminal/main/install.ps1'
+$legalTerminalReleaseBase = 'https://github.com/jurisupport/legal-terminal/releases/latest/download'
 $guide     = 'https://github.com/jurisupport/jurisupport-plugins'
 $legalTerminalGuide = 'https://github.com/jurisupport/legal-terminal'
 $nativeGuide = 'https://github.com/jurisupport/jurisupport-plugins/blob/main/WINDOWS_NATIVE.md'
@@ -40,28 +40,36 @@ function Get-LegalTerminalPath {
     if (Test-Path $candidate) { return $candidate }
   }
 
-  $shortcutCandidates = @(
-    "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\legal-terminal.lnk",
-    "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\legal-terminal.lnk"
-  ) | Where-Object { $_ }
+  $shortcutRoots = @(
+    "$env:APPDATA\Microsoft\Windows\Start Menu\Programs",
+    "$env:ProgramData\Microsoft\Windows\Start Menu\Programs"
+  ) | Where-Object { $_ -and (Test-Path $_) }
 
-  foreach ($candidate in $shortcutCandidates) {
-    if (Test-Path $candidate) { return $candidate }
+  foreach ($root in $shortcutRoots) {
+    try {
+      $shortcut = Get-ChildItem -LiteralPath $root -Filter '*legal-terminal*.lnk' -File -Recurse -Depth 3 -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+      if ($shortcut -and $shortcut.FullName) { return $shortcut.FullName }
+    } catch {}
   }
 
   $searchRoots = @(
     "$env:LOCALAPPDATA\Programs",
     "$env:LOCALAPPDATA",
+    "$env:ProgramFiles",
+    "${env:ProgramFiles(x86)}",
     "$HOME\Downloads",
     "$HOME\Desktop"
   ) | Where-Object { $_ -and (Test-Path $_) }
 
   foreach ($root in $searchRoots) {
-    try {
-      $match = Get-ChildItem -LiteralPath $root -Filter 'legal-terminal.exe' -File -Recurse -Depth 3 -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-      if ($match -and $match.FullName) { return $match.FullName }
-    } catch {}
+    foreach ($filter in @('legal-terminal.exe', 'legal-terminal*.exe', 'Legal Terminal*.exe')) {
+      try {
+        $match = Get-ChildItem -LiteralPath $root -Filter $filter -File -Recurse -Depth 4 -ErrorAction SilentlyContinue |
+          Select-Object -First 1
+        if ($match -and $match.FullName) { return $match.FullName }
+      } catch {}
+    }
   }
 
   return $null
@@ -574,27 +582,61 @@ function Invoke-PluginBootstrap {
 }
 
 function Invoke-LegalTerminalInstall {
-  $psExe = Get-PowerShellExe
-  if (-not $psExe) {
-    Write-Host "  PowerShell 실행 파일을 찾지 못했습니다."
-    return $false
+  param([switch]$Portable)
+
+  $assetName = if ($Portable) { 'legal-terminal-portable.exe' } else { 'legal-terminal-Setup.exe' }
+  $downloadUrl = ('{0}/{1}' -f $legalTerminalReleaseBase, $assetName)
+  $downloadPath = if ($Portable) {
+    Join-Path (Join-Path $HOME 'Downloads') $assetName
+  } else {
+    Join-Path ([System.IO.Path]::GetTempPath()) $assetName
   }
 
-  $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "legal-terminal-install-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
-    Write-Host "  legal-terminal 설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri $legalTerminalInstaller -OutFile $tmp -UseBasicParsing -Headers (Get-NoCacheHeaders) -ErrorAction Stop
-    try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
+    $downloadDir = Split-Path -Parent $downloadPath
+    New-Item -ItemType Directory -Path $downloadDir -Force | Out-Null
 
-    & $psExe -NoProfile -ExecutionPolicy Bypass -File $tmp
-    return ($LASTEXITCODE -eq 0)
+    if ($Portable) {
+      Write-Host "  legal-terminal 포터블 앱을 내려받습니다..."
+    } else {
+      Write-Host "  legal-terminal 설치 파일을 내려받습니다..."
+    }
+    Write-Host "  $downloadUrl"
+    Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath -UseBasicParsing -Headers (Get-NoCacheHeaders) -ErrorAction Stop
+    try { Unblock-File -LiteralPath $downloadPath -ErrorAction SilentlyContinue } catch {}
+
+    if ($Portable) {
+      Write-Host "  포터블 앱을 실행합니다: $downloadPath"
+      Start-Process -FilePath $downloadPath | Out-Null
+      return (Test-Path -LiteralPath $downloadPath)
+    }
+
+    Write-Host "  설치 파일을 실행합니다. 설치 창이 뜨면 안내에 따라 마무리해 주세요."
+    $process = Start-Process -FilePath $downloadPath -Wait -PassThru
+    if ($process.ExitCode -ne 0) {
+      Write-Host "  legal-terminal 설치 파일 종료 코드: $($process.ExitCode)"
+      return $false
+    }
+    return $true
   } catch {
     Write-Host "  legal-terminal 설치 실패: $($_.Exception.Message)"
     Write-Host "  수동 설치 안내: $legalTerminalGuide"
     return $false
-  } finally {
-    if (Test-Path $tmp) { Remove-Item $tmp -Force -ErrorAction SilentlyContinue }
   }
+}
+
+function Install-LegalTerminalWithFallback {
+  param([string]$ActionName)
+
+  $installOk = Invoke-LegalTerminalInstall
+  $verifyOk = Test-LegalTerminalInstallComplete $ActionName
+  if ($installOk -and $verifyOk) { return $true }
+
+  Write-Host ""
+  Write-Host "  설치형 앱이 감지되지 않아 포터블 버전을 Downloads에 받아 실행합니다."
+  $portableOk = Invoke-LegalTerminalInstall -Portable
+  $portableVerifyOk = Test-LegalTerminalInstallComplete "$ActionName/포터블"
+  return ($portableOk -and $portableVerifyOk)
 }
 
 Write-Host "========================================"
@@ -695,9 +737,7 @@ if ((-not $legalTerminalStatus.Installed) -and (-not $skipToolInstall)) {
   Write-Host "  legal-terminal 설치 안내: $legalTerminalGuide"
   $ltAns = (Read-Host "  legal-terminal 앱을 설치할까요? (Y/n, Enter=설치)").Trim()
   if (($ltAns -eq '') -or ($ltAns -match '^[yY]')) {
-    $legalTerminalInstallOk = Invoke-LegalTerminalInstall
-    $legalTerminalVerifyOk = Test-LegalTerminalInstallComplete '설치'
-    if (-not ($legalTerminalInstallOk -and $legalTerminalVerifyOk)) {
+    if (-not (Install-LegalTerminalWithFallback '설치')) {
       Write-Host "  legal-terminal 설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
     }
   } else {
@@ -708,9 +748,7 @@ if ((-not $legalTerminalStatus.Installed) -and (-not $skipToolInstall)) {
   Write-Host "  legal-terminal 업데이트가 필요합니다."
   $ltAns = (Read-Host "  legal-terminal 앱을 최신 버전으로 업데이트할까요? (Y/n, Enter=업데이트)").Trim()
   if (($ltAns -eq '') -or ($ltAns -match '^[yY]')) {
-    $legalTerminalInstallOk = Invoke-LegalTerminalInstall
-    $legalTerminalVerifyOk = Test-LegalTerminalInstallComplete '업데이트'
-    if (-not ($legalTerminalInstallOk -and $legalTerminalVerifyOk)) {
+    if (-not (Install-LegalTerminalWithFallback '업데이트')) {
       Write-Host "  legal-terminal 업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
     }
   } else {
