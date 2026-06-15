@@ -20,7 +20,7 @@
 **Windows** — PowerShell에:
 
 ```powershell
-irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex
+irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616" | iex
 ```
 
 **macOS · Linux** — 터미널에:
@@ -44,7 +44,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jurisupport/claudecode-songm
 
 ```powershell
 $p = "$env:TEMP\claudecode2-setup-check.ps1"
-iwr https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 -OutFile $p -UseBasicParsing
+iwr "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616" -OutFile $p -UseBasicParsing
 Unblock-File $p
 powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File $p
 ```

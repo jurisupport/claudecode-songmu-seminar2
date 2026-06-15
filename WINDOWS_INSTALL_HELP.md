@@ -12,7 +12,7 @@ README의 Windows 한 줄을 실행했을 때 설치 질문이 나오면 `N`을 
 
 ```powershell
 $p = "$env:TEMP\claudecode2-setup-check.ps1"
-iwr https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 -OutFile $p -UseBasicParsing
+iwr "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616" -OutFile $p -UseBasicParsing
 Unblock-File $p
 powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File $p
 ```
