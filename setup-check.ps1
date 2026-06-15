@@ -1,5 +1,5 @@
 # 클로드코드 2차 — 점검 · 설치 · 자료 받기 (Windows / PowerShell)
-# 사용:  irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex
+# 사용:  irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616" | iex
 
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
@@ -14,7 +14,7 @@ $repoUrl   = 'https://github.com/jurisupport/claudecode-songmu-seminar2.git'
 $archiveUrl = 'https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.zip'
 $dest      = Join-Path $HOME 'Downloads\클로드코드2차자료'
 $practiceDir = Join-Path $dest '실습사건_세션1_대여금'
-$self      = 'irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex'
+$self      = 'irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616" | iex'
 
 function Has-Plugins {
   (Get-JuriSupportPluginsHealth).Complete
@@ -433,12 +433,19 @@ function Get-PowerShellExe {
   return $null
 }
 
+function Get-NoCacheHeaders {
+  @{
+    'Cache-Control' = 'no-cache'
+    'Pragma' = 'no-cache'
+  }
+}
+
 function Show-WindowsInstallHelp {
   Write-Host ""
   Write-Host "  Windows 보안 설정으로 설치가 막힐 때:"
   Write-Host "    1) 새 PowerShell 창을 열고 아래 4줄로 로컬 파일 실행을 시도하세요:"
   Write-Host "       `$p = `"`$env:TEMP\claudecode2-setup-check.ps1`""
-  Write-Host "       iwr https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 -OutFile `$p -UseBasicParsing"
+  Write-Host "       iwr `"https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=20260616`" -OutFile `$p -UseBasicParsing"
   Write-Host "       Unblock-File `$p"
   Write-Host "       powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File `$p"
   Write-Host ""
@@ -464,7 +471,7 @@ function Invoke-PluginBootstrap {
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "jurisupport-bootstrap-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
     Write-Host "  설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri "${bootstrap}?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
+    Invoke-WebRequest -Uri $bootstrap -OutFile $tmp -UseBasicParsing -Headers (Get-NoCacheHeaders) -ErrorAction Stop
     try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
 
     $oldReport = $env:JURISUPPORT_SUPPORT_REPORT
@@ -500,7 +507,7 @@ function Invoke-LegalTerminalInstall {
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "legal-terminal-install-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
     Write-Host "  legal-terminal 설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri "${legalTerminalInstaller}?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
+    Invoke-WebRequest -Uri $legalTerminalInstaller -OutFile $tmp -UseBasicParsing -Headers (Get-NoCacheHeaders) -ErrorAction Stop
     try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
 
     & $psExe -NoProfile -ExecutionPolicy Bypass -File $tmp
