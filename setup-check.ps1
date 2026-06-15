@@ -1,5 +1,5 @@
 # 클로드코드 2차 — 점검 · 설치 · 자료 받기 (Windows / PowerShell)
-# 사용:  irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=d56081a" | iex
+# 사용:  irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=legalproc" | iex
 
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
@@ -14,7 +14,7 @@ $repoUrl   = 'https://github.com/jurisupport/claudecode-songmu-seminar2.git'
 $archiveUrl = 'https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.zip'
 $dest      = Join-Path $HOME 'Downloads\클로드코드2차자료'
 $practiceDir = Join-Path $dest '실습사건_세션1_대여금'
-$self      = 'irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=d56081a" | iex'
+$self      = 'irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=legalproc" | iex'
 
 function Has-Plugins {
   (Get-JuriSupportPluginsHealth).Complete
@@ -75,6 +75,20 @@ function Get-LegalTerminalPath {
   return $null
 }
 
+function Get-LegalTerminalRunningProcess {
+  try {
+    return Get-Process -ErrorAction SilentlyContinue |
+      Where-Object {
+        ($_.ProcessName -like 'legal-terminal*') -or
+        ($_.ProcessName -like 'LegalTerminal*') -or
+        ($_.MainWindowTitle -match '(?i)legal[- ]?terminal')
+      } |
+      Select-Object -First 1
+  } catch {}
+
+  return $null
+}
+
 function ConvertTo-ExePath {
   param([AllowNull()][string]$Value)
   if (-not $Value) { return $null }
@@ -127,6 +141,18 @@ function Get-LegalTerminalInstallInfo {
       Path = $registryPath
       Version = $entry.DisplayVersion
       Source = 'registry'
+    }
+  }
+
+  $process = Get-LegalTerminalRunningProcess
+  if ($process) {
+    $processPath = $null
+    try { $processPath = $process.Path } catch {}
+    return [pscustomobject]@{
+      Installed = $true
+      Path = $processPath
+      Version = $null
+      Source = 'process'
     }
   }
 
@@ -548,7 +574,7 @@ function Show-WindowsInstallHelp {
   Write-Host "  Windows 보안 설정으로 설치가 막힐 때:"
   Write-Host "    1) 새 PowerShell 창을 열고 아래 4줄로 로컬 파일 실행을 시도하세요:"
   Write-Host "       `$p = `"`$env:TEMP\claudecode2-setup-check.ps1`""
-  Write-Host "       iwr `"https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=d56081a`" -OutFile `$p -UseBasicParsing"
+  Write-Host "       iwr `"https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1?cache=legalproc`" -OutFile `$p -UseBasicParsing"
   Write-Host "       Unblock-File `$p"
   Write-Host "       powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File `$p"
   Write-Host ""
