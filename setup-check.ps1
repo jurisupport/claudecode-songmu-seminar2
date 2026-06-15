@@ -399,6 +399,25 @@ function Test-LegalTerminalInstallComplete {
   return $false
 }
 
+function Wait-LegalTerminalDetected {
+  param(
+    [string]$ActionName,
+    [int]$TimeoutSeconds = 120
+  )
+
+  Write-Host ""
+  Write-Host "  legal-terminal $ActionName 완료 감지를 기다립니다. 설치 창이 떠 있으면 먼저 마무리해 주세요."
+
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  while ((Get-Date) -lt $deadline) {
+    $status = Get-LegalTerminalStatus
+    if ($status.Installed -and (-not $status.NeedsUpdate)) { return $true }
+    Start-Sleep -Seconds 5
+  }
+
+  return $false
+}
+
 function Repair-JuriSupportPluginsFromRepo {
   $repoDir = Join-Path $HOME 'jurisupport-plugins'
   $installSh = Join-Path $repoDir 'install.sh'
@@ -629,14 +648,27 @@ function Install-LegalTerminalWithFallback {
   param([string]$ActionName)
 
   $installOk = Invoke-LegalTerminalInstall
-  $verifyOk = Test-LegalTerminalInstallComplete $ActionName
-  if ($installOk -and $verifyOk) { return $true }
+  if (Wait-LegalTerminalDetected $ActionName) { return $true }
 
-  Write-Host ""
-  Write-Host "  설치형 앱이 감지되지 않아 포터블 버전을 Downloads에 받아 실행합니다."
+  if ($installOk) {
+    Write-Host ""
+    Write-Host "  설치형 앱이 아직 감지되지 않습니다."
+    Write-Host "  설치 창이 뒤에 떠 있거나 설치 위치 감지가 늦을 수 있어 포터블을 자동으로 받지 않습니다."
+    $fallbackAns = (Read-Host "  포터블 버전을 대신 받을까요? (y/N, Enter=건너뛰기)").Trim()
+    if ($fallbackAns -notmatch '^[yY]') {
+      Write-Host "  포터블 다운로드는 건너뜁니다. 시작 메뉴에서 legal-terminal 설치 여부를 확인해 주세요."
+      return $true
+    }
+  } else {
+    Write-Host ""
+    Write-Host "  설치형 앱 실행이 실패했습니다."
+    $fallbackAns = (Read-Host "  포터블 버전을 대신 받을까요? (Y/n, Enter=포터블 받기)").Trim()
+    if ($fallbackAns -match '^[nN]') { return $false }
+  }
+
   $portableOk = Invoke-LegalTerminalInstall -Portable
-  $portableVerifyOk = Test-LegalTerminalInstallComplete "$ActionName/포터블"
-  return ($portableOk -and $portableVerifyOk)
+  if (Wait-LegalTerminalDetected "$ActionName/포터블" -TimeoutSeconds 20) { return $true }
+  return $portableOk
 }
 
 Write-Host "========================================"
