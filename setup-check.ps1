@@ -1,5 +1,5 @@
 # 클로드코드 2차 — 점검 · 설치 · 자료 받기 (Windows / PowerShell)
-# 사용:  irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/cfee48a612db1a54ce2802b4e812ffeb2f0a6f5b/setup-check.ps1" | iex
+# 사용:  irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/d56081a18643541678986300e924fddbd7e28548/setup-check.ps1" | iex
 
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
@@ -14,7 +14,7 @@ $repoUrl   = 'https://github.com/jurisupport/claudecode-songmu-seminar2.git'
 $archiveUrl = 'https://github.com/jurisupport/claudecode-songmu-seminar2/archive/refs/heads/main.zip'
 $dest      = Join-Path $HOME 'Downloads\클로드코드2차자료'
 $practiceDir = Join-Path $dest '실습사건_세션1_대여금'
-$self      = 'irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/cfee48a612db1a54ce2802b4e812ffeb2f0a6f5b/setup-check.ps1" | iex'
+$self      = 'irm "https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/d56081a18643541678986300e924fddbd7e28548/setup-check.ps1" | iex'
 
 function Has-Plugins {
   (Get-JuriSupportPluginsHealth).Complete
@@ -548,7 +548,7 @@ function Show-WindowsInstallHelp {
   Write-Host "  Windows 보안 설정으로 설치가 막힐 때:"
   Write-Host "    1) 새 PowerShell 창을 열고 아래 4줄로 로컬 파일 실행을 시도하세요:"
   Write-Host "       `$p = `"`$env:TEMP\claudecode2-setup-check.ps1`""
-  Write-Host "       iwr `"https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/cfee48a612db1a54ce2802b4e812ffeb2f0a6f5b/setup-check.ps1`" -OutFile `$p -UseBasicParsing"
+  Write-Host "       iwr `"https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/d56081a18643541678986300e924fddbd7e28548/setup-check.ps1`" -OutFile `$p -UseBasicParsing"
   Write-Host "       Unblock-File `$p"
   Write-Host "       powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File `$p"
   Write-Host ""
