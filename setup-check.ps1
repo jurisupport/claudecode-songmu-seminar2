@@ -391,6 +391,82 @@ function Test-LegalTerminalInstallComplete {
   return $false
 }
 
+function Repair-JuriSupportPluginsFromRepo {
+  $repoDir = Join-Path $HOME 'jurisupport-plugins'
+  $installSh = Join-Path $repoDir 'install.sh'
+  $manifest = Join-Path $repoDir 'plugins\jurisupport\.claude-plugin\plugin.json'
+
+  if ((Get-JuriSupportPluginsHealth).Complete) { return $true }
+  if ((-not (Test-Path -LiteralPath $installSh -PathType Leaf)) -or
+    (-not (Test-Path -LiteralPath $manifest -PathType Leaf))) {
+    return $false
+  }
+
+  Write-Host ""
+  Write-Host "  jurisupport-plugins 저장소는 있으나 일부 구성이 빠져 있어 직접 복구합니다..."
+
+  $ok = $true
+  foreach ($skillsRoot in @((Join-Path $HOME '.claude\skills'), (Join-Path $HOME '.codex\skills'))) {
+    foreach ($skill in @('lbox-guide', 'beopgoeul-search')) {
+      $source = Join-Path (Join-Path $repoDir "skills\$skill") 'SKILL.md'
+      $targetDir = Join-Path $skillsRoot $skill
+      $target = Join-Path $targetDir 'SKILL.md'
+      try {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+        Copy-Item -LiteralPath $source -Destination $target -Force -ErrorAction Stop
+        Write-Host "    - 스킬 복구: $skill"
+      } catch {
+        Write-Host "    - 스킬 복구 실패: $skill ($($_.Exception.Message))"
+        $ok = $false
+      }
+    }
+  }
+
+  try {
+    $commandsDir = Join-Path $HOME '.claude\commands'
+    $commandSource = Join-Path $repoDir 'skills\beopgoeul-search\SKILL.md'
+    $commandTarget = Join-Path $commandsDir 'beopgoeul-search.md'
+    New-Item -ItemType Directory -Path $commandsDir -Force | Out-Null
+    Copy-Item -LiteralPath $commandSource -Destination $commandTarget -Force -ErrorAction Stop
+    Write-Host "    - 명령 복구: beopgoeul-search"
+  } catch {
+    Write-Host "    - 명령 복구 실패: beopgoeul-search ($($_.Exception.Message))"
+    $ok = $false
+  }
+
+  $claude = Get-ClaudeCommand
+  if (-not $claude) {
+    Write-Host "    - Claude Code CLI를 찾지 못해 플러그인 등록을 복구하지 못했습니다."
+    return $false
+  }
+
+  try {
+    $marketplaceList = (& $claude plugin marketplace list 2>$null | Out-String)
+    if ($marketplaceList -notmatch '(?i)jurisupport-plugins') {
+      Write-Host "    - Claude marketplace 등록: jurisupport-plugins"
+      & $claude plugin marketplace add $repoDir
+      if ($LASTEXITCODE -ne 0) { $ok = $false }
+    }
+  } catch {
+    Write-Host "    - Claude marketplace 확인/등록 실패: $($_.Exception.Message)"
+    $ok = $false
+  }
+
+  try {
+    $pluginList = (& $claude plugin list 2>$null | Out-String)
+    if ($pluginList -notmatch '(?im)^\s*(?:\S+\s+)?jurisupport(@|\s|$)') {
+      Write-Host "    - Claude plugin 설치: jurisupport"
+      & $claude plugin install jurisupport@jurisupport-plugins
+      if ($LASTEXITCODE -ne 0) { $ok = $false }
+    }
+  } catch {
+    Write-Host "    - Claude plugin 확인/설치 실패: $($_.Exception.Message)"
+    $ok = $false
+  }
+
+  return ($ok -and (Get-JuriSupportPluginsHealth).Complete)
+}
+
 function Get-Materials {
   $parent = Split-Path $dest -Parent
   New-Item -ItemType Directory -Path $parent -Force | Out-Null
@@ -550,9 +626,10 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  설치를 시작합니다... (약 15분, UAC 팝업이 뜨면 '예')"
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    $bootstrapOk = Invoke-PluginBootstrap
+    $null = Invoke-PluginBootstrap
+    $null = Repair-JuriSupportPluginsFromRepo
     $verifyOk = Test-CoreInstallComplete '설치'
-    if (-not ($bootstrapOk -and $verifyOk)) {
+    if (-not $verifyOk) {
       Write-Host ""
       Write-Host "  설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -561,9 +638,10 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  보안/진단 모드로 설치를 시작합니다... (약 15분, UAC 팝업이 뜨면 '예')"
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    $bootstrapOk = Invoke-PluginBootstrap -SupportMode
+    $null = Invoke-PluginBootstrap -SupportMode
+    $null = Repair-JuriSupportPluginsFromRepo
     $verifyOk = Test-CoreInstallComplete '설치'
-    if (-not ($bootstrapOk -and $verifyOk)) {
+    if (-not $verifyOk) {
       Write-Host ""
       Write-Host "  설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -586,9 +664,10 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  업데이트를 시작합니다..."
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    $bootstrapOk = Invoke-PluginBootstrap
+    $null = Invoke-PluginBootstrap
+    $null = Repair-JuriSupportPluginsFromRepo
     $verifyOk = Test-CoreInstallComplete '업데이트'
-    if (-not ($bootstrapOk -and $verifyOk)) {
+    if (-not $verifyOk) {
       Write-Host ""
       Write-Host "  업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -597,9 +676,10 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  보안/진단 모드로 업데이트를 시작합니다..."
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    $bootstrapOk = Invoke-PluginBootstrap -SupportMode
+    $null = Invoke-PluginBootstrap -SupportMode
+    $null = Repair-JuriSupportPluginsFromRepo
     $verifyOk = Test-CoreInstallComplete '업데이트'
-    if (-not ($bootstrapOk -and $verifyOk)) {
+    if (-not $verifyOk) {
       Write-Host ""
       Write-Host "  업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
