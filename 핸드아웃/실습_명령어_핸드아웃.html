@@ -150,19 +150,18 @@
   <h2 class="sec">0. 시작 전 셋업 <span class="time">강의 시작 전 함께</span></h2>
 
   <div class="card">
-    <div class="label">0-1. 압축 풀기</div>
-    <div class="hint">단톡방의 <code>세션1 대여금사건.zip</code>을 다운로드한 뒤 <b>더블클릭</b>해서 압축을 푸세요. <code>세션1 대여금사건</code> 폴더가 생깁니다.</div>
+    <div class="label">0-1. 자료 폴더 확인</div>
+    <div class="hint">README의 한 줄 설치를 실행했다면 <code>Downloads/클로드코드2차자료</code> 안에 <code>실습사건_세션1_대여금</code> 폴더가 있습니다. ZIP으로 받은 경우에도 압축을 푼 뒤 같은 사건 폴더를 찾으세요.</div>
   </div>
 
   <div class="card">
     <div class="label">0-2. 그 폴더에서 클로드 실행</div>
-    <div class="hint">터미널에 아래를 붙여넣습니다. 권한 질문이 나오면 내용 확인 후 <b>Yes</b>. 이후 모든 명령은 터미널이 아니라 <b>클로드 채팅창</b>에 붙여넣습니다.</div>
+    <div class="hint">README의 한 줄 스크립트가 끝났다면 이미 실습 폴더로 이동되어 있습니다. 터미널에 아래를 붙여넣습니다. 권한 질문이 나오면 내용 확인 후 <b>Yes</b>. 이후 모든 명령은 터미널이 아니라 <b>클로드 채팅창</b>에 붙여넣습니다.</div>
     <div class="codewrap">
-<pre>cd ~/Downloads/"세션1 대여금사건"
-claude</pre>
+<pre>claude</pre>
       <button class="copybtn" onclick="copyCmd(this)">복사</button>
     </div>
-    <div class="tip">💡 폴더 위치가 다르면 — 터미널에 <code>cd </code> 만 치고 한 칸 띄운 뒤, 압축 푼 폴더를 터미널 창으로 <b>끌어다 놓으면</b> 경로가 자동 입력됩니다. 그다음 엔터.</div>
+    <div class="tip">💡 직접 ZIP으로 받은 경우 — 터미널에 <code>cd </code> 만 치고 한 칸 띄운 뒤, <code>실습사건_세션1_대여금</code> 폴더를 터미널 창으로 <b>끌어다 놓으면</b> 경로가 자동 입력됩니다. 그다음 엔터 후 <code>claude</code>.</div>
   </div>
 
   <!-- ===== 1. 전원 따라하기 ===== -->
@@ -283,7 +282,8 @@ korean-law MCP로 전부 재확인하고, 확인 안 되는 인용이 있으면
   <h2 class="sec">막혔을 때</h2>
   <table>
     <tr><th>증상</th><th>해결</th></tr>
-    <tr><td>클로드가 파일을 못 읽음</td><td>클로드에게 그대로: <b>"사건파일을 못 읽는 것 같아. 지금 어느 폴더에 있는지 확인하고, 세션1 대여금사건 폴더의 파일들을 읽어줘."</b> (그래도 안 되면 클로드를 끄고 셋업 0-2를 다시 실행)</td></tr>
+    <tr><td>클로드가 파일을 못 읽음</td><td>클로드에게 그대로: <b>"사건파일을 못 읽는 것 같아. 지금 어느 폴더에 있는지 확인하고, 실습사건_세션1_대여금 폴더의 파일들을 읽어줘."</b> (그래도 안 되면 클로드를 끄고 셋업 0-2를 다시 실행)</td></tr>
+    <tr><td>Windows 보안 설정으로 설치가 막힘</td><td>README의 <b>Windows에서 PowerShell 한 줄이 막히면</b> 부분을 따라 하고, 설치 선택지에서 <b>S</b>(보안/진단 모드)를 선택하세요. 시간이 없으면 <b>N</b>으로 자료만 받아도 됩니다.</td></tr>
     <tr><td>권한 질문이 계속 나옴</td><td>내용 확인하고 Yes — 가상사건이라 안전합니다</td></tr>
     <tr><td>응답이 중간에 끊김</td><td>"계속해줘" 입력</td></tr>
     <tr><td>한도 초과(rate limit)</td><td>옆자리 화면 같이 보기 + 잠시 후 재시도</td></tr>
@@ -305,7 +305,7 @@ korean-law MCP로 전부 재확인하고, 확인 안 되는 인용이 있으면
   <!-- ===== 5. 집에 가서 ===== -->
   <h2 class="sec">집에 가서 — 첫 사건 1개</h2>
   <p class="sec-desc">오늘 흐름을 <b>실제 진행 중인 사건 1개</b>에 그대로 적용해 보세요. 사건 PDF들을 폴더 하나에 모아두고, 그 폴더에서 <code>claude</code>를 실행한 뒤 <b>[명령 1] → [명령 4] → [명령 6] → [명령 7]</b> 순서 그대로.</p>
-  <p class="sec-desc">자세한 안내는 <code>99_사후활용가이드</code> / 질문은 단톡방.</p>
+  <p class="sec-desc">자세한 안내는 README와 <code>핸드아웃/강의내용_핸드아웃.html</code> / 질문은 단톡방.</p>
 
   <footer>
     클로드코드로 송무하기 · 쥬리서포트 · 2026.06.15<br>
