@@ -37,9 +37,7 @@ get_materials() {
 }
 
 has_legal_terminal() {
-  [ -d "/Applications/legal-terminal.app" ] ||
-    [ -d "$HOME/Applications/legal-terminal.app" ] ||
-    [ -d "$HOME/Downloads/legal-terminal.app" ]
+  get_legal_terminal_app >/dev/null 2>&1
 }
 
 short_ref() {
@@ -79,6 +77,55 @@ get_plugins_latest_ref() {
   fi
 }
 
+plugins_present() {
+  [ -d "$HOME/jurisupport-plugins" ] ||
+    [ -d "$HOME/.claude/skills/lbox-guide" ] ||
+    [ -d "$HOME/.claude/skills/beopgoeul-search" ] ||
+    [ -d "$HOME/.codex/skills/lbox-guide" ] ||
+    [ -d "$HOME/.codex/skills/beopgoeul-search" ]
+}
+
+append_missing() {
+  if [ -n "${missing:-}" ]; then
+    missing="$missing, $1"
+  else
+    missing="$1"
+  fi
+}
+
+get_plugins_missing() {
+  missing=""
+  repo="$HOME/jurisupport-plugins"
+
+  [ -f "$repo/install.sh" ] || append_missing "repo/install.sh"
+  [ -f "$repo/plugins/jurisupport/.claude-plugin/plugin.json" ] || append_missing "plugin manifest"
+
+  for skills_root in "$HOME/.claude/skills" "$HOME/.codex/skills"; do
+    root_label=".claude"
+    case "$skills_root" in
+      "$HOME/.codex/skills") root_label=".codex" ;;
+    esac
+    for skill in lbox-guide beopgoeul-search; do
+      [ -f "$skills_root/$skill/SKILL.md" ] || append_missing "$root_label $skill skill"
+    done
+  done
+
+  [ -f "$HOME/.claude/commands/beopgoeul-search.md" ] || append_missing "beopgoeul command"
+
+  if command -v claude >/dev/null 2>&1; then
+    if ! claude plugin list 2>/dev/null | grep -Eq '(^|[[:space:]])jurisupport([[:space:]]|$|@)'; then
+      append_missing "Claude plugin jurisupport"
+    fi
+    if ! claude plugin marketplace list 2>/dev/null | grep -q "jurisupport-plugins"; then
+      append_missing "Claude marketplace jurisupport-plugins"
+    fi
+  else
+    append_missing "Claude Code CLI"
+  fi
+
+  printf '%s' "$missing"
+}
+
 get_legal_terminal_app() {
   for app in "/Applications/legal-terminal.app" "$HOME/Applications/legal-terminal.app" "$HOME/Downloads/legal-terminal.app"; do
     if [ -d "$app" ]; then
@@ -86,6 +133,13 @@ get_legal_terminal_app() {
       return 0
     fi
   done
+  if command -v mdfind >/dev/null 2>&1; then
+    found="$(mdfind "kMDItemCFBundleIdentifier == 'kr.lawpid.legalterminal'" 2>/dev/null | head -1)"
+    if [ -n "$found" ] && [ -d "$found" ]; then
+      printf '%s\n' "$found"
+      return 0
+    fi
+  fi
   return 1
 }
 
@@ -114,16 +168,28 @@ write_status() {
   current="$3"
   latest="$4"
   needs_update="$5"
+  missing="${6:-}"
 
   if [ "$installed" -ne 1 ]; then
-    echo "  [--] $name 미설치"
+    if [ -n "$missing" ]; then
+      echo "  [--] $name 미설치/불완전 (누락: $(printf '%.140s' "$missing"))"
+    else
+      echo "  [--] $name 미설치"
+    fi
     return
   fi
 
   mark="[OK]"
   [ "$needs_update" -eq 1 ] && mark="[!!]"
+  [ -n "$missing" ] && mark="[!!]"
   details=""
+  if [ -n "$missing" ]; then
+    details="불완전, 누락: $(printf '%.140s' "$missing")"
+  fi
   [ -n "$current" ] && details="현재 $(short_ref "$current")"
+  if [ -n "$missing" ] && [ -n "$current" ]; then
+    details="불완전, 누락: $(printf '%.100s' "$missing"), 현재 $(short_ref "$current")"
+  fi
   if [ -n "$latest" ]; then
     [ -n "$details" ] && details="$details, "
     details="${details}최신 $(short_ref "$latest")"
@@ -131,7 +197,7 @@ write_status() {
   if [ "$needs_update" -eq 1 ]; then
     [ -n "$details" ] && details="$details, "
     details="${details}업데이트 필요"
-  elif [ -n "$current" ] && [ -n "$latest" ]; then
+  elif [ -z "$missing" ] && [ -n "$current" ] && [ -n "$latest" ]; then
     details="$details, 최신 상태"
   elif [ -z "$current" ] && [ -n "$latest" ]; then
     [ -n "$details" ] && details="$details, "
@@ -140,10 +206,56 @@ write_status() {
     [ -n "$details" ] && details="$details, "
     details="${details}최신 버전 확인 불가"
   else
-    details="버전 확인 불가"
+    [ -n "$details" ] || details="버전 확인 불가"
   fi
 
   echo "  $mark $name ($details)"
+}
+
+verify_core_install() {
+  action="$1"
+  post_missing="$(get_plugins_missing)"
+  post_has_claude=0
+  command -v claude >/dev/null 2>&1 && post_has_claude=1
+  if [ "$post_has_claude" -eq 1 ] && [ -z "$post_missing" ]; then
+    return 0
+  fi
+
+  echo
+  echo "  $action 후 점검에서 누락을 발견했습니다."
+  [ "$post_has_claude" -eq 1 ] || echo "    - Claude Code CLI"
+  if [ -n "$post_missing" ]; then
+    old_ifs="$IFS"
+    IFS=','
+    for item in $post_missing; do
+      trimmed="$(printf '%s' "$item" | sed 's/^ *//; s/ *$//')"
+      [ -n "$trimmed" ] && echo "    - $trimmed"
+    done
+    IFS="$old_ifs"
+  fi
+  return 1
+}
+
+verify_legal_terminal_install() {
+  action="$1"
+  if ! has_legal_terminal; then
+    echo
+    echo "  legal-terminal $action 후 점검에서 문제가 발견됐습니다."
+    echo "    - legal-terminal 앱이 감지되지 않음"
+    return 1
+  fi
+
+  post_current="$(get_legal_terminal_current_version)"
+  post_latest="$(get_legal_terminal_latest_version)"
+  if [ -n "$post_current" ] && [ -n "$post_latest" ] &&
+    [ "$(version_clean "$post_current")" != "$(version_clean "$post_latest")" ]; then
+    echo
+    echo "  legal-terminal $action 후 점검에서 문제가 발견됐습니다."
+    echo "    - legal-terminal 최신 버전 아님"
+    return 1
+  fi
+
+  return 0
 }
 
 install_legal_terminal() {
@@ -187,9 +299,10 @@ echo "========================================"
 
 has_claude=0;  command -v claude >/dev/null 2>&1 && has_claude=1
 has_plugins=0
-if [ -d "$HOME/jurisupport-plugins" ] || [ -d "$HOME/.claude/skills/brief-draft" ] || [ -d "$HOME/.claude/skills/beopgoeul-search" ]; then
-  has_plugins=1
-fi
+plugins_missing="$(get_plugins_missing)"
+[ -z "$plugins_missing" ] && has_plugins=1
+plugins_present_status=0
+if [ "$has_plugins" -eq 1 ] || plugins_present; then plugins_present_status=1; fi
 has_legal_terminal_status=0; has_legal_terminal && has_legal_terminal_status=1
 claude_current="$(get_claude_current_version)"
 claude_latest="$(get_claude_latest_version)"
@@ -204,7 +317,7 @@ legal_terminal_needs_update=0
 [ -n "$plugins_current" ] && [ -n "$plugins_latest" ] && [ "$plugins_current" != "$plugins_latest" ] && plugins_needs_update=1
 [ -n "$legal_terminal_current" ] && [ -n "$legal_terminal_latest" ] && [ "$(version_clean "$legal_terminal_current")" != "$(version_clean "$legal_terminal_latest")" ] && legal_terminal_needs_update=1
 write_status "Claude Code" "$has_claude" "$claude_current" "$claude_latest" "$claude_needs_update"
-write_status "jurisupport-plugins" "$has_plugins" "$plugins_current" "$plugins_latest" "$plugins_needs_update"
+write_status "jurisupport-plugins" "$plugins_present_status" "$plugins_current" "$plugins_latest" "$plugins_needs_update" "$plugins_missing"
 write_status "legal-terminal" "$has_legal_terminal_status" "$legal_terminal_current" "$legal_terminal_latest" "$legal_terminal_needs_update"
 echo "----------------------------------------"
 
@@ -225,7 +338,11 @@ if [ "$has_claude" -ne 1 ] || [ "$has_plugins" -ne 1 ]; then
       ;;
     *)
       echo; echo "  설치를 시작합니다… (약 5~10분)"; echo
-      bash <(curl -fsSL "$BOOTSTRAP")
+      bootstrap_ok=0
+      bash <(curl -fsSL "$BOOTSTRAP") || bootstrap_ok=$?
+      if [ "$bootstrap_ok" -ne 0 ] || ! verify_core_install "설치"; then
+        echo "  설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      fi
       ;;
   esac
 elif [ "$claude_needs_update" -eq 1 ] || [ "$plugins_needs_update" -eq 1 ]; then
@@ -239,7 +356,11 @@ elif [ "$claude_needs_update" -eq 1 ] || [ "$plugins_needs_update" -eq 1 ]; then
       ;;
     *)
       echo; echo "  업데이트를 시작합니다…"; echo
-      bash <(curl -fsSL "$BOOTSTRAP")
+      bootstrap_ok=0
+      bash <(curl -fsSL "$BOOTSTRAP") || bootstrap_ok=$?
+      if [ "$bootstrap_ok" -ne 0 ] || ! verify_core_install "업데이트"; then
+        echo "  업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      fi
       ;;
   esac
 fi
@@ -254,7 +375,9 @@ if ! has_legal_terminal && [ "$skip_tool_install" -ne 1 ]; then
       echo "  legal-terminal 설치는 건너뜁니다."
       ;;
     *)
-      install_legal_terminal || echo "  legal-terminal 설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      if ! install_legal_terminal || ! verify_legal_terminal_install "설치"; then
+        echo "  legal-terminal 설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      fi
       ;;
   esac
 elif [ "$legal_terminal_needs_update" -eq 1 ] && [ "$skip_tool_install" -ne 1 ]; then
@@ -267,7 +390,9 @@ elif [ "$legal_terminal_needs_update" -eq 1 ] && [ "$skip_tool_install" -ne 1 ];
       echo "  legal-terminal 업데이트는 건너뜁니다."
       ;;
     *)
-      install_legal_terminal || echo "  legal-terminal 업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      if ! install_legal_terminal || ! verify_legal_terminal_install "업데이트"; then
+        echo "  legal-terminal 업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
+      fi
       ;;
   esac
 fi

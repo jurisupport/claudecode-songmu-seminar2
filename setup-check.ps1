@@ -17,19 +17,19 @@ $practiceDir = Join-Path $dest '실습사건_세션1_대여금'
 $self      = 'irm https://raw.githubusercontent.com/jurisupport/claudecode-songmu-seminar2/main/setup-check.ps1 | iex'
 
 function Has-Plugins {
-  (Test-Path "$HOME\jurisupport-plugins") -or
-  (Test-Path "$HOME\.claude\skills\brief-draft") -or
-  (Test-Path "$HOME\.claude\skills\beopgoeul-search")
+  (Get-JuriSupportPluginsHealth).Complete
 }
 
 function Has-LegalTerminal {
-  [bool](Get-LegalTerminalPath)
+  (Get-LegalTerminalInstallInfo).Installed
 }
 
 function Get-LegalTerminalPath {
   $candidates = @(
     "$env:LOCALAPPDATA\Programs\legal-terminal\legal-terminal.exe",
+    "$env:LOCALAPPDATA\legal-terminal\legal-terminal.exe",
     "$HOME\AppData\Local\Programs\legal-terminal\legal-terminal.exe",
+    "$HOME\AppData\Local\legal-terminal\legal-terminal.exe",
     "$env:ProgramFiles\legal-terminal\legal-terminal.exe",
     "${env:ProgramFiles(x86)}\legal-terminal\legal-terminal.exe",
     "$HOME\Desktop\legal-terminal-portable.exe",
@@ -49,7 +49,85 @@ function Get-LegalTerminalPath {
     if (Test-Path $candidate) { return $candidate }
   }
 
+  $searchRoots = @(
+    "$env:LOCALAPPDATA\Programs",
+    "$env:LOCALAPPDATA",
+    "$HOME\Downloads",
+    "$HOME\Desktop"
+  ) | Where-Object { $_ -and (Test-Path $_) }
+
+  foreach ($root in $searchRoots) {
+    try {
+      $match = Get-ChildItem -LiteralPath $root -Filter 'legal-terminal.exe' -File -Recurse -Depth 3 -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+      if ($match -and $match.FullName) { return $match.FullName }
+    } catch {}
+  }
+
   return $null
+}
+
+function ConvertTo-ExePath {
+  param([AllowNull()][string]$Value)
+  if (-not $Value) { return $null }
+  $path = $Value.Trim().Trim('"')
+  if ($path -match '^(.*?\.exe)') { $path = $matches[1] }
+  $path = $path.Trim('"')
+  if ($path -and (Test-Path -LiteralPath $path)) { return $path }
+  return $null
+}
+
+function Get-LegalTerminalRegistryEntry {
+  $roots = @(
+    'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+    'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+    'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+  )
+
+  foreach ($root in $roots) {
+    try {
+      $entry = Get-ItemProperty $root -ErrorAction SilentlyContinue |
+        Where-Object { $_.DisplayName -match '(?i)legal[- ]?terminal' } |
+        Select-Object -First 1
+      if ($entry) { return $entry }
+    } catch {}
+  }
+
+  return $null
+}
+
+function Get-LegalTerminalInstallInfo {
+  $path = Get-LegalTerminalPath
+  if ($path) {
+    return [pscustomobject]@{
+      Installed = $true
+      Path = $path
+      Version = $null
+      Source = 'path'
+    }
+  }
+
+  $entry = Get-LegalTerminalRegistryEntry
+  if ($entry) {
+    $registryPath = ConvertTo-ExePath $entry.DisplayIcon
+    if ((-not $registryPath) -and $entry.InstallLocation) {
+      $registryPath = ConvertTo-ExePath (Join-Path $entry.InstallLocation 'legal-terminal.exe')
+    }
+
+    return [pscustomobject]@{
+      Installed = $true
+      Path = $registryPath
+      Version = $entry.DisplayVersion
+      Source = 'registry'
+    }
+  }
+
+  [pscustomobject]@{
+    Installed = $false
+    Path = $null
+    Version = $null
+    Source = $null
+  }
 }
 
 function ConvertTo-ComparableVersion {
@@ -68,8 +146,76 @@ function Get-NpmCommand {
   return $null
 }
 
+function Get-ClaudeCommand {
+  foreach ($name in @('claude.cmd', 'claude.exe', 'claude')) {
+    $cmd = Get-Command $name -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($cmd -and $cmd.Source) { return $cmd.Source }
+  }
+  return $null
+}
+
+function Get-JuriSupportPluginsHealth {
+  $repoDir = Join-Path $HOME 'jurisupport-plugins'
+  $missing = New-Object System.Collections.Generic.List[string]
+
+  if (-not (Test-Path -LiteralPath (Join-Path $repoDir 'install.sh') -PathType Leaf)) {
+    $missing.Add('repo/install.sh') | Out-Null
+  }
+  if (-not (Test-Path -LiteralPath (Join-Path $repoDir 'plugins\jurisupport\.claude-plugin\plugin.json') -PathType Leaf)) {
+    $missing.Add('plugin manifest') | Out-Null
+  }
+
+  $skillRoots = @(
+    [pscustomobject]@{ Label = '.claude'; Path = (Join-Path $HOME '.claude\skills') },
+    [pscustomobject]@{ Label = '.codex'; Path = (Join-Path $HOME '.codex\skills') }
+  )
+
+  foreach ($skillsRoot in $skillRoots) {
+    foreach ($skill in @('lbox-guide', 'beopgoeul-search')) {
+      $skillFile = Join-Path (Join-Path $skillsRoot.Path $skill) 'SKILL.md'
+      if (-not (Test-Path -LiteralPath $skillFile -PathType Leaf)) {
+        $missing.Add("$($skillsRoot.Label) $skill skill") | Out-Null
+      }
+    }
+  }
+
+  $commandFile = Join-Path $HOME '.claude\commands\beopgoeul-search.md'
+  if (-not (Test-Path -LiteralPath $commandFile -PathType Leaf)) {
+    $missing.Add('beopgoeul command') | Out-Null
+  }
+
+  $claude = Get-ClaudeCommand
+  if ($claude) {
+    $pluginList = $null
+    try { $pluginList = (& $claude plugin list 2>$null | Out-String) } catch {}
+    if ((-not $pluginList) -or ($pluginList -notmatch '(?im)^\s*(?:\S+\s+)?jurisupport(@|\s|$)')) {
+      $missing.Add('Claude plugin jurisupport') | Out-Null
+    }
+
+    $marketplaceList = $null
+    try { $marketplaceList = (& $claude plugin marketplace list 2>$null | Out-String) } catch {}
+    if ((-not $marketplaceList) -or ($marketplaceList -notmatch '(?i)jurisupport-plugins')) {
+      $missing.Add('Claude marketplace jurisupport-plugins') | Out-Null
+    }
+  } else {
+    $missing.Add('Claude Code CLI') | Out-Null
+  }
+
+  $present = (Test-Path -LiteralPath $repoDir -PathType Container) -or
+    (Test-Path -LiteralPath (Join-Path $HOME '.claude\skills\lbox-guide') -PathType Container) -or
+    (Test-Path -LiteralPath (Join-Path $HOME '.claude\skills\beopgoeul-search') -PathType Container) -or
+    (Test-Path -LiteralPath (Join-Path $HOME '.codex\skills\lbox-guide') -PathType Container) -or
+    (Test-Path -LiteralPath (Join-Path $HOME '.codex\skills\beopgoeul-search') -PathType Container)
+
+  [pscustomobject]@{
+    Present = $present
+    Complete = ($missing.Count -eq 0)
+    Missing = @($missing.ToArray())
+  }
+}
+
 function Get-ClaudeStatus {
-  $installed = [bool](Get-Command claude.cmd -ErrorAction SilentlyContinue) -or [bool](Get-Command claude -ErrorAction SilentlyContinue)
+  $installed = [bool](Get-ClaudeCommand)
   $current = $null
   $latest = $null
 
@@ -102,7 +248,7 @@ function Get-ClaudeStatus {
 }
 
 function Get-JuriSupportPluginsStatus {
-  $installed = Has-Plugins
+  $health = Get-JuriSupportPluginsHealth
   $repoDir = Join-Path $HOME 'jurisupport-plugins'
   $current = $null
   $latest = $null
@@ -122,7 +268,9 @@ function Get-JuriSupportPluginsStatus {
   }
 
   [pscustomobject]@{
-    Installed = $installed
+    Installed = $health.Present
+    Complete = $health.Complete
+    Missing = $health.Missing
     Current = $current
     Latest = $latest
     NeedsUpdate = $needsUpdate
@@ -130,9 +278,10 @@ function Get-JuriSupportPluginsStatus {
 }
 
 function Get-LegalTerminalStatus {
-  $path = Get-LegalTerminalPath
-  $installed = [bool]$path
-  $current = $null
+  $info = Get-LegalTerminalInstallInfo
+  $path = $info.Path
+  $installed = $info.Installed
+  $current = $info.Version
   $latest = $null
   $needsUpdate = $false
 
@@ -159,6 +308,7 @@ function Get-LegalTerminalStatus {
     Latest = $latest
     NeedsUpdate = $needsUpdate
     Path = $path
+    Source = $info.Source
   }
 }
 
@@ -176,21 +326,69 @@ function Write-InstallStatus {
   )
 
   if (-not $Status.Installed) {
-    Write-Host "  [--] $Name 미설치"
+    if ($Status.PSObject.Properties['Missing'] -and $Status.Missing) {
+      Write-Host "  [--] $Name 미설치/불완전 (누락: $($Status.Missing -join ', '))"
+    } else {
+      Write-Host "  [--] $Name 미설치"
+    }
     return
   }
 
-  $mark = if ($Status.NeedsUpdate) { '[!!]' } else { '[OK]' }
+  $isIncomplete = $false
+  if ($Status.PSObject.Properties['Complete']) { $isIncomplete = -not $Status.Complete }
+  $mark = if ($Status.NeedsUpdate -or $isIncomplete) { '[!!]' } else { '[OK]' }
   $parts = @()
+  if ($isIncomplete) {
+    $parts += '불완전'
+    if ($Status.Missing) {
+      $parts += "누락: $($Status.Missing -join ', ')"
+    }
+  }
   if ($Status.Current) { $parts += "현재 $(Format-ShortRef $Status.Current)" }
   if ($Status.Latest) { $parts += "최신 $(Format-ShortRef $Status.Latest)" }
   if ($Status.NeedsUpdate) { $parts += '업데이트 필요' }
-  elseif ($Status.Current -and $Status.Latest) { $parts += '최신 상태' }
+  elseif ((-not $isIncomplete) -and $Status.Current -and $Status.Latest) { $parts += '최신 상태' }
   elseif ((-not $Status.Current) -and $Status.Latest) { $parts += '현재 버전 확인 불가' }
   elseif ($Status.Current -and (-not $Status.Latest)) { $parts += '최신 버전 확인 불가' }
   if (($parts.Count -eq 0) -and $Status.Installed) { $parts += '버전 확인 불가' }
 
   Write-Host "  $mark $Name ($($parts -join ', '))"
+}
+
+function Test-CoreInstallComplete {
+  param([string]$ActionName)
+
+  $afterClaude = Get-ClaudeStatus
+  $afterPlugins = Get-JuriSupportPluginsStatus
+  if ($afterClaude.Installed -and $afterPlugins.Complete) { return $true }
+
+  Write-Host ""
+  Write-Host "  $ActionName 후 점검에서 누락을 발견했습니다."
+  if (-not $afterClaude.Installed) {
+    Write-Host "    - Claude Code CLI"
+  }
+  if (-not $afterPlugins.Complete) {
+    foreach ($item in $afterPlugins.Missing) {
+      Write-Host "    - $item"
+    }
+  }
+  return $false
+}
+
+function Test-LegalTerminalInstallComplete {
+  param([string]$ActionName)
+
+  $afterLegalTerminal = Get-LegalTerminalStatus
+  if ($afterLegalTerminal.Installed -and (-not $afterLegalTerminal.NeedsUpdate)) { return $true }
+
+  Write-Host ""
+  Write-Host "  legal-terminal $ActionName 후 점검에서 문제가 발견됐습니다."
+  if (-not $afterLegalTerminal.Installed) {
+    Write-Host "    - legal-terminal 앱이 감지되지 않음"
+  } elseif ($afterLegalTerminal.NeedsUpdate) {
+    Write-Host "    - legal-terminal 최신 버전 아님"
+  }
+  return $false
 }
 
 function Get-Materials {
@@ -330,7 +528,7 @@ Write-Host "----------------------------------------"
 
 $skipToolInstall = $false
 
-$needsCoreInstall = -not ($claudeStatus.Installed -and $pluginsStatus.Installed)
+$needsCoreInstall = -not ($claudeStatus.Installed -and $pluginsStatus.Complete)
 $needsCoreUpdate = ($claudeStatus.NeedsUpdate -or $pluginsStatus.NeedsUpdate)
 
 if ($needsCoreInstall) {
@@ -345,7 +543,9 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  설치를 시작합니다... (약 15분, UAC 팝업이 뜨면 '예')"
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    if (-not (Invoke-PluginBootstrap)) {
+    $bootstrapOk = Invoke-PluginBootstrap
+    $verifyOk = Test-CoreInstallComplete '설치'
+    if (-not ($bootstrapOk -and $verifyOk)) {
       Write-Host ""
       Write-Host "  설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -354,7 +554,9 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  보안/진단 모드로 설치를 시작합니다... (약 15분, UAC 팝업이 뜨면 '예')"
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    if (-not (Invoke-PluginBootstrap -SupportMode)) {
+    $bootstrapOk = Invoke-PluginBootstrap -SupportMode
+    $verifyOk = Test-CoreInstallComplete '설치'
+    if (-not ($bootstrapOk -and $verifyOk)) {
       Write-Host ""
       Write-Host "  설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -377,7 +579,9 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  업데이트를 시작합니다..."
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    if (-not (Invoke-PluginBootstrap)) {
+    $bootstrapOk = Invoke-PluginBootstrap
+    $verifyOk = Test-CoreInstallComplete '업데이트'
+    if (-not ($bootstrapOk -and $verifyOk)) {
       Write-Host ""
       Write-Host "  업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -386,7 +590,9 @@ if ($needsCoreInstall) {
     Write-Host ""
     Write-Host "  보안/진단 모드로 업데이트를 시작합니다..."
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    if (-not (Invoke-PluginBootstrap -SupportMode)) {
+    $bootstrapOk = Invoke-PluginBootstrap -SupportMode
+    $verifyOk = Test-CoreInstallComplete '업데이트'
+    if (-not ($bootstrapOk -and $verifyOk)) {
       Write-Host ""
       Write-Host "  업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
       Show-WindowsInstallHelp
@@ -402,7 +608,9 @@ if ((-not $legalTerminalStatus.Installed) -and (-not $skipToolInstall)) {
   Write-Host "  legal-terminal 설치 안내: $legalTerminalGuide"
   $ltAns = (Read-Host "  legal-terminal 앱을 설치할까요? (Y/n, Enter=설치)").Trim()
   if (($ltAns -eq '') -or ($ltAns -match '^[yY]')) {
-    if (-not (Invoke-LegalTerminalInstall)) {
+    $legalTerminalInstallOk = Invoke-LegalTerminalInstall
+    $legalTerminalVerifyOk = Test-LegalTerminalInstallComplete '설치'
+    if (-not ($legalTerminalInstallOk -and $legalTerminalVerifyOk)) {
       Write-Host "  legal-terminal 설치가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
     }
   } else {
@@ -413,7 +621,9 @@ if ((-not $legalTerminalStatus.Installed) -and (-not $skipToolInstall)) {
   Write-Host "  legal-terminal 업데이트가 필요합니다."
   $ltAns = (Read-Host "  legal-terminal 앱을 최신 버전으로 업데이트할까요? (Y/n, Enter=업데이트)").Trim()
   if (($ltAns -eq '') -or ($ltAns -match '^[yY]')) {
-    if (-not (Invoke-LegalTerminalInstall)) {
+    $legalTerminalInstallOk = Invoke-LegalTerminalInstall
+    $legalTerminalVerifyOk = Test-LegalTerminalInstallComplete '업데이트'
+    if (-not ($legalTerminalInstallOk -and $legalTerminalVerifyOk)) {
       Write-Host "  legal-terminal 업데이트가 완료되지 않았습니다. 그래도 강의 자료는 계속 받습니다."
     }
   } else {
