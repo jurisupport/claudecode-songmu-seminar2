@@ -464,7 +464,7 @@ function Invoke-PluginBootstrap {
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "jurisupport-bootstrap-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
     Write-Host "  설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri "$bootstrap?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
+    Invoke-WebRequest -Uri "${bootstrap}?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
     try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
 
     $oldReport = $env:JURISUPPORT_SUPPORT_REPORT
@@ -500,7 +500,7 @@ function Invoke-LegalTerminalInstall {
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "legal-terminal-install-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
     Write-Host "  legal-terminal 설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri "$legalTerminalInstaller?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
+    Invoke-WebRequest -Uri "${legalTerminalInstaller}?t=$(Get-Random)" -OutFile $tmp -UseBasicParsing -ErrorAction Stop
     try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
 
     & $psExe -NoProfile -ExecutionPolicy Bypass -File $tmp
