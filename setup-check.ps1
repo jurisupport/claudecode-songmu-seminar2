@@ -27,13 +27,41 @@ function Has-LegalTerminal {
 function Get-LegalTerminalPath {
   $candidates = @(
     "$env:LOCALAPPDATA\Programs\legal-terminal\legal-terminal.exe",
+    "$env:LOCALAPPDATA\Programs\legal-terminal\LegalTerminal.exe",
+    "$env:LOCALAPPDATA\Programs\legal-terminal\Legal Terminal.exe",
+    "$env:LOCALAPPDATA\Programs\Legal Terminal\legal-terminal.exe",
+    "$env:LOCALAPPDATA\Programs\Legal Terminal\LegalTerminal.exe",
+    "$env:LOCALAPPDATA\Programs\Legal Terminal\Legal Terminal.exe",
     "$env:LOCALAPPDATA\legal-terminal\legal-terminal.exe",
+    "$env:LOCALAPPDATA\legal-terminal\LegalTerminal.exe",
+    "$env:LOCALAPPDATA\legal-terminal\Legal Terminal.exe",
     "$HOME\AppData\Local\Programs\legal-terminal\legal-terminal.exe",
+    "$HOME\AppData\Local\Programs\legal-terminal\LegalTerminal.exe",
+    "$HOME\AppData\Local\Programs\legal-terminal\Legal Terminal.exe",
+    "$HOME\AppData\Local\Programs\Legal Terminal\legal-terminal.exe",
+    "$HOME\AppData\Local\Programs\Legal Terminal\LegalTerminal.exe",
+    "$HOME\AppData\Local\Programs\Legal Terminal\Legal Terminal.exe",
     "$HOME\AppData\Local\legal-terminal\legal-terminal.exe",
+    "$HOME\AppData\Local\legal-terminal\LegalTerminal.exe",
+    "$HOME\AppData\Local\legal-terminal\Legal Terminal.exe",
     "$env:ProgramFiles\legal-terminal\legal-terminal.exe",
+    "$env:ProgramFiles\legal-terminal\LegalTerminal.exe",
+    "$env:ProgramFiles\legal-terminal\Legal Terminal.exe",
+    "$env:ProgramFiles\Legal Terminal\legal-terminal.exe",
+    "$env:ProgramFiles\Legal Terminal\LegalTerminal.exe",
+    "$env:ProgramFiles\Legal Terminal\Legal Terminal.exe",
     "${env:ProgramFiles(x86)}\legal-terminal\legal-terminal.exe",
+    "${env:ProgramFiles(x86)}\legal-terminal\LegalTerminal.exe",
+    "${env:ProgramFiles(x86)}\legal-terminal\Legal Terminal.exe",
+    "${env:ProgramFiles(x86)}\Legal Terminal\legal-terminal.exe",
+    "${env:ProgramFiles(x86)}\Legal Terminal\LegalTerminal.exe",
+    "${env:ProgramFiles(x86)}\Legal Terminal\Legal Terminal.exe",
     "$HOME\Desktop\legal-terminal-portable.exe",
-    "$HOME\Downloads\legal-terminal-portable.exe"
+    "$HOME\Desktop\LegalTerminal-portable.exe",
+    "$HOME\Desktop\Legal Terminal Portable.exe",
+    "$HOME\Downloads\legal-terminal-portable.exe",
+    "$HOME\Downloads\LegalTerminal-portable.exe",
+    "$HOME\Downloads\Legal Terminal Portable.exe"
   ) | Where-Object { $_ }
 
   foreach ($candidate in $candidates) {
@@ -47,9 +75,15 @@ function Get-LegalTerminalPath {
 
   foreach ($root in $shortcutRoots) {
     try {
-      $shortcut = Get-ChildItem -LiteralPath $root -Filter '*legal-terminal*.lnk' -File -Recurse -Depth 3 -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-      if ($shortcut -and $shortcut.FullName) { return $shortcut.FullName }
+      foreach ($filter in @('*legal-terminal*.lnk', '*LegalTerminal*.lnk', '*Legal Terminal*.lnk')) {
+        $shortcut = Get-ChildItem -LiteralPath $root -Filter $filter -File -Recurse -Depth 3 -ErrorAction SilentlyContinue |
+          Select-Object -First 1
+        if ($shortcut -and $shortcut.FullName) {
+          $target = Resolve-ShortcutTarget -Path $shortcut.FullName
+          if ($target) { return $target }
+          return $shortcut.FullName
+        }
+      }
     } catch {}
   }
 
@@ -63,7 +97,7 @@ function Get-LegalTerminalPath {
   ) | Where-Object { $_ -and (Test-Path $_) }
 
   foreach ($root in $searchRoots) {
-    foreach ($filter in @('legal-terminal.exe', 'legal-terminal*.exe', 'Legal Terminal*.exe')) {
+    foreach ($filter in @('legal-terminal.exe', 'legal-terminal*.exe', 'LegalTerminal*.exe', 'Legal Terminal*.exe')) {
       try {
         $match = Get-ChildItem -LiteralPath $root -Filter $filter -File -Recurse -Depth 4 -ErrorAction SilentlyContinue |
           Select-Object -First 1
@@ -96,6 +130,21 @@ function ConvertTo-ExePath {
   if ($path -match '^(.*?\.exe)') { $path = $matches[1] }
   $path = $path.Trim('"')
   if ($path -and (Test-Path -LiteralPath $path)) { return $path }
+  return $null
+}
+
+function Resolve-ShortcutTarget {
+  param([AllowNull()][string]$Path)
+  if ((-not $Path) -or ($Path -notlike '*.lnk') -or (-not (Test-Path -LiteralPath $Path))) {
+    return $null
+  }
+
+  try {
+    $shell = New-Object -ComObject WScript.Shell
+    $shortcut = $shell.CreateShortcut($Path)
+    return ConvertTo-ExePath $shortcut.TargetPath
+  } catch {}
+
   return $null
 }
 
@@ -133,7 +182,10 @@ function Get-LegalTerminalInstallInfo {
   if ($entry) {
     $registryPath = ConvertTo-ExePath $entry.DisplayIcon
     if ((-not $registryPath) -and $entry.InstallLocation) {
-      $registryPath = ConvertTo-ExePath (Join-Path $entry.InstallLocation 'legal-terminal.exe')
+      foreach ($exeName in @('legal-terminal.exe', 'LegalTerminal.exe', 'Legal Terminal.exe')) {
+        $registryPath = ConvertTo-ExePath (Join-Path $entry.InstallLocation $exeName)
+        if ($registryPath) { break }
+      }
     }
 
     return [pscustomobject]@{
@@ -169,7 +221,21 @@ function ConvertTo-ComparableVersion {
   if (-not $Value) { return $null }
   $clean = $Value.Trim()
   if ($clean.StartsWith('v')) { $clean = $clean.Substring(1) }
-  return $clean
+
+  if ($clean -match '([0-9]+(?:\.[0-9]+){0,3})') {
+    $parts = New-Object System.Collections.Generic.List[int]
+    foreach ($part in $matches[1].Split('.')) {
+      $parts.Add([int]$part) | Out-Null
+    }
+
+    while (($parts.Count -gt 3) -and ($parts[$parts.Count - 1] -eq 0)) {
+      $parts.RemoveAt($parts.Count - 1)
+    }
+
+    return ($parts.ToArray() -join '.')
+  }
+
+  return $clean.ToLowerInvariant()
 }
 
 function Get-NpmCommand {
@@ -325,10 +391,20 @@ function Get-LegalTerminalStatus {
       if ($versionInfo.ProductVersion) { $current = $versionInfo.ProductVersion }
       elseif ($versionInfo.FileVersion) { $current = $versionInfo.FileVersion }
     } catch {}
+  } elseif ($path -and ($path -like '*.lnk')) {
+    $targetPath = Resolve-ShortcutTarget -Path $path
+    if ($targetPath) {
+      $path = $targetPath
+      try {
+        $versionInfo = (Get-Item -LiteralPath $path).VersionInfo
+        if ($versionInfo.ProductVersion) { $current = $versionInfo.ProductVersion }
+        elseif ($versionInfo.FileVersion) { $current = $versionInfo.FileVersion }
+      } catch {}
+    }
   }
 
   try {
-    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/jurisupport/legal-terminal/releases/latest' -ErrorAction Stop
+    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/jurisupport/legal-terminal/releases/latest' -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
     if ($release.tag_name) { $latest = $release.tag_name }
   } catch {}
 
@@ -435,9 +511,21 @@ function Wait-LegalTerminalDetected {
   Write-Host "  legal-terminal $ActionName 완료 감지를 기다립니다. 설치 창이 떠 있으면 먼저 마무리해 주세요."
 
   $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  $attempt = 0
   while ((Get-Date) -lt $deadline) {
+    $attempt += 1
     $status = Get-LegalTerminalStatus
-    if ($status.Installed -and (-not $status.NeedsUpdate)) { return $true }
+    if ($status.Installed) {
+      $where = if ($status.Path) { " ($($status.Path))" } else { '' }
+      Write-Host "  legal-terminal 감지됨$where"
+      if ($status.NeedsUpdate) {
+        Write-Host "  설치는 감지됐지만 버전 확인상 최신이 아닐 수 있습니다. 현재 $($status.Current), 최신 $($status.Latest)"
+      }
+      return $true
+    }
+    if (($attempt % 3) -eq 0) {
+      Write-Host "  아직 감지 중입니다... 설치 창이 뒤에 떠 있으면 마무리해 주세요."
+    }
     Start-Sleep -Seconds 5
   }
 
