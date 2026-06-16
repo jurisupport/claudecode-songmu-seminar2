@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>실습 명령어 핸드아웃 · 클로드코드 2차</title>
+<title>실습 프롬프트 핸드아웃 · 클로드코드 2차</title>
 <style>
   :root{
     --blue:#2563EB; --blue-d:#1d4ed8; --ink:#1f2937; --muted:#6b7280;
@@ -85,7 +85,7 @@
   .factbox ol li{margin:4px 0; font-size:14.8px}
   .mission{margin-top:12px; padding:10px 13px; background:#eff6ff; border-radius:10px;
     font-size:14.8px; border:1px solid #bfdbfe}
-  /* 명령 3원칙 */
+  /* 프롬프트 3원칙 */
   .principles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0}
   .principles .p{background:var(--card); border:1px solid var(--line); border-radius:12px;
     padding:13px 12px; text-align:center}
@@ -110,13 +110,13 @@
 <div class="wrap">
 
   <header class="top">
-    <h1>실습 명령어 핸드아웃</h1>
+    <h1>실습 프롬프트 핸드아웃</h1>
     <p>클로드코드 2차 강의 겸 세미나 · 쥬리서포트</p>
-    <p>2026. 6. 15. · 하희봉 변호사</p>
+    <p>2026. 6. 17. · 강의 후 보완판 · 하희봉 변호사</p>
   </header>
 
   <div class="howto">
-    📋 <b>타이핑하지 마세요.</b> 각 명령 아래 <b>[복사]</b> 버튼을 누르고, 클로드 채팅창에 붙여넣기(⌘V) 하면 됩니다.
+    📋 <b>타이핑하지 마세요.</b> 각 프롬프트 아래 <b>[복사]</b> 버튼을 누르고, 클로드 채팅창에 붙여넣기(⌘V) 하면 됩니다.
   </div>
 
   <div class="notice">
@@ -137,13 +137,24 @@
     <div class="mission">🎯 <b>오늘의 미션</b> — 여러분은 <b>원고(김민철)의 소송대리인</b>입니다. 위 4가지 항변을 반박하는 <b>준비서면 1~2페이지</b>를 클로드코드로 작성합니다.</div>
   </div>
 
-  <!-- ===== 명령 3원칙 ===== -->
-  <h2 class="sec">잘 시키는 3원칙</h2>
-  <p class="sec-desc">아래 명령들이 왜 이렇게 길고 구체적인지 — 이 세 가지가 박혀 있기 때문입니다.</p>
+  <!-- ===== 프롬프트 3원칙 ===== -->
+  <h2 class="sec">잘 부탁하는 3원칙</h2>
+  <p class="sec-desc">아래 프롬프트들이 왜 이렇게 구체적인지 — 이 세 가지가 박혀 있기 때문입니다.</p>
   <div class="principles">
     <div class="p"><div class="pi">📂</div><b>맥락</b><span>사건폴더를 먼저 읽힌다</span></div>
     <div class="p"><div class="pi">⚖️</div><b>입장</b><span>"원고 대리인 입장에서"</span></div>
     <div class="p"><div class="pi">📐</div><b>형식</b><span>표·분량·저장파일을 못박는다</span></div>
+  </div>
+  <div class="tip">💡 실사례에서 가장 많이 반복된 교훈은 하나입니다. <b>작업 프롬프트</b>와 <b>검수 프롬프트</b>를 분리하세요. 먼저 쓰게 하고, 그다음 출처·당사자·금액·버전을 따로 검사시키면 사고가 크게 줄어듭니다.</div>
+
+  <div class="card">
+    <div class="label">오늘 프롬프트를 쓰는 순서</div>
+    <table>
+      <tr><th>시간이 있으면</th><th>추천 순서</th><th>목표</th></tr>
+      <tr><td>10분</td><td>프롬프트 1 → 프롬프트 7</td><td>사건 파악 + 인용 검수 습관 만들기</td></tr>
+      <tr><td>30분</td><td>프롬프트 1 → 2 → 4 → 6 → 7</td><td>쟁점·근거·초안·검수까지 한 바퀴</td></tr>
+      <tr><td>집에서</td><td>brief-protocol → mock-hearing → 제출 전 체크</td><td>표준절차로 쓰고, 모의변론으로 깨본 뒤 제출 판단</td></tr>
+    </table>
   </div>
 
   <!-- ===== 0. 셋업 ===== -->
@@ -154,22 +165,28 @@
     <div class="hint">README의 한 줄 설치를 실행했다면 <code>Downloads/클로드코드2차자료</code> 안에 <code>실습사건_세션1_대여금</code> 폴더가 있습니다. ZIP으로 받은 경우에도 압축을 푼 뒤 같은 사건 폴더를 찾으세요.</div>
   </div>
 
+  <div class="card do">
+    <div class="label">0-2. 권장: legal-terminal에서 사건 열기</div>
+    <div class="hint">일반 터미널보다 이쪽이 쉽습니다. 앱에서 <b>새 사건 → 작성서류 폴더</b>를 누르고 <code>실습사건_세션1_대여금</code> 폴더를 선택하면, 사건 폴더 기준 Claude Agent 탭이 열립니다. 이후 모든 프롬프트는 Agent 채팅창에 붙여넣습니다.</div>
+    <div class="tip">💡 legal-terminal은 Claude Code, Markdown 준비서면, 전자소송기록 뷰어, JuriSupport 사건·기일 화면을 한곳에 모은 앱입니다. 파일을 보면서 바로 Claude에 물을 수 있어 수업용으로도 훨씬 덜 헷갈립니다.</div>
+  </div>
+
   <div class="card">
-    <div class="label">0-2. 그 폴더에서 클로드 실행</div>
-    <div class="hint">README의 한 줄 스크립트가 끝났다면 이미 실습 폴더로 이동되어 있습니다. 터미널에 아래를 붙여넣습니다. 권한 질문이 나오면 내용 확인 후 <b>Yes</b>. 이후 모든 명령은 터미널이 아니라 <b>클로드 채팅창</b>에 붙여넣습니다.</div>
+    <div class="label">0-3. 대안: 일반 터미널에서 클로드 실행</div>
+    <div class="hint">legal-terminal이 없거나 앱 실행이 안 될 때만 이 방법을 씁니다. README의 한 줄 스크립트가 끝났다면 이미 실습 폴더로 이동되어 있습니다. 터미널에 아래를 붙여넣습니다. 권한 질문이 나오면 내용 확인 후 <b>Yes</b>. 이후 모든 프롬프트는 터미널이 아니라 <b>클로드 채팅창</b>에 붙여넣습니다.</div>
     <div class="codewrap">
 <pre>claude</pre>
       <button class="copybtn" onclick="copyCmd(this)">복사</button>
     </div>
-    <div class="tip">💡 직접 ZIP으로 받은 경우 — 터미널에 <code>cd </code> 만 치고 한 칸 띄운 뒤, <code>실습사건_세션1_대여금</code> 폴더를 터미널 창으로 <b>끌어다 놓으면</b> 경로가 자동 입력됩니다. 그다음 엔터 후 <code>claude</code>.</div>
+    <div class="tip">💡 직접 ZIP으로 받은 경우 — 터미널에 <code>cd </code> 만 치고 한 칸 띄운 뒤, <code>실습사건_세션1_대여금</code> 폴더를 터미널 창으로 <b>끌어다 놓으면</b> 경로가 자동 입력됩니다. 그다음 엔터 후 <code>claude</code>. 다만 가능하면 legal-terminal에서 폴더를 여는 편이 더 쉽습니다.</div>
   </div>
 
   <!-- ===== 1. 전원 따라하기 ===== -->
   <h2 class="sec">1. 첫 따라하기 — 사건 파악 <span class="time">18:48~</span></h2>
-  <p class="sec-desc">오늘 <b>다 같이 직접 치는 단 한 번</b>입니다. 강사가 먼저 시연한 뒤, 같이 [명령 1]을 실행합니다.</p>
+  <p class="sec-desc">오늘 <b>다 같이 직접 붙여넣는 첫 프롬프트</b>입니다. 강사가 먼저 시연한 뒤, 같이 [프롬프트 1]을 실행합니다.</p>
 
   <div class="card do">
-    <div class="label"><span class="badge follow">전원 따라하기</span> 명령 1 · 사건기록 전체 읽고 정리</div>
+    <div class="label"><span class="badge follow">전원 따라하기</span> 프롬프트 1 · 사건기록 전체 읽고 정리</div>
     <div class="codewrap">
 <pre>이 폴더의 사건기록 전체를 읽고, 사실관계를 시간순으로 정리한 다음
 양 당사자의 핵심 주장과 쟁점을 알려줘.</pre>
@@ -179,7 +196,7 @@
   </div>
 
   <div class="card">
-    <div class="label"><span class="badge opt">여유 있으면</span> 명령 2 · 양측 주장 표로</div>
+    <div class="label"><span class="badge opt">여유 있으면</span> 프롬프트 2 · 양측 주장 표로</div>
     <div class="codewrap">
 <pre>피고 답변서의 항변 4가지를 표로 정리하고, 각 항변에 대해
 원고 측에서 쓸 수 있는 반박 방향을 한 줄씩 붙여줘.</pre>
@@ -188,7 +205,7 @@
   </div>
 
   <div class="card">
-    <div class="label"><span class="badge opt">여유 있으면</span> 명령 3 · 증거 대조</div>
+    <div class="label"><span class="badge opt">여유 있으면</span> 프롬프트 3 · 증거 대조</div>
     <div class="codewrap">
 <pre>갑호증과 을호증을 쟁점별로 대응시켜서, 각 쟁점에서
 어느 쪽 증거가 더 유리한지 평가해줘.</pre>
@@ -198,10 +215,10 @@
 
   <!-- ===== 2. 메인 시연 ===== -->
   <h2 class="sec">2. 메인 — 준비서면 초안 <span class="time">19:50~20:30</span></h2>
-  <p class="sec-desc"><b>강사가 큰 화면으로 시연</b>합니다(명령 4→5→6→7). 화면을 보시고, 집에서 본인 사건으로 그대로 따라 하세요.</p>
+  <p class="sec-desc"><b>강사가 큰 화면으로 시연</b>합니다(프롬프트 4→5→6→7). 화면을 보시고, 집에서 본인 사건으로 그대로 따라 하세요.</p>
 
   <div class="card">
-    <div class="label"><span class="badge demo">강사 시연</span> 명령 4 · 법령 확인 (korean-law)</div>
+    <div class="label"><span class="badge demo">강사 시연</span> 프롬프트 4 · 법령 확인 (korean-law)</div>
     <div class="codewrap">
 <pre>소멸시효(민법 제162조), 시효중단 사유로서의 채무승인(민법 제168조 제3호),
 시효이익의 포기에 관한 조문을 korean-law MCP로 가져와서
@@ -211,8 +228,8 @@
   </div>
 
   <div class="card">
-    <div class="label"><span class="badge demo">강사 시연</span> 명령 5 · 판례 확인 (법고을)</div>
-    <div class="hint">법고을(beopgoeul-search) 미설치인 분은 이 단계는 시연 화면을 보고 다음으로 넘어가세요.</div>
+    <div class="label"><span class="badge demo">강사 시연</span> 프롬프트 5 · 판례 확인 (beopgoeul-search)</div>
+    <div class="hint">beopgoeul-search(법고을) 미설치인 분은 이 단계는 시연 화면을 보고 다음으로 넘어가세요.</div>
     <div class="codewrap">
 <pre>beopgoeul-search로 다음 두 가지 판결을 찾아줘:
 가. 일부변제가 채무승인에 해당하는지
@@ -223,7 +240,7 @@
   </div>
 
   <div class="card">
-    <div class="label"><span class="badge home">집에서 따라하기</span> 명령 6 · 준비서면 초안 작성</div>
+    <div class="label"><span class="badge home">집에서 따라하기</span> 프롬프트 6 · 준비서면 초안 작성</div>
     <div class="codewrap">
 <pre>지금까지 정리한 내용을 바탕으로, 원고 소송대리인 입장에서
 피고 답변서에 대한 반박 준비서면 초안을 작성해줘.
@@ -236,19 +253,37 @@
   </div>
 
   <div class="card do">
-    <div class="label"><span class="badge home">집에서 따라하기</span> 명령 7 · 자기검증 <b>(가장 중요)</b></div>
+    <div class="label"><span class="badge home">집에서 따라하기</span> 프롬프트 7 · 자기검증 <b>(가장 중요)</b></div>
     <div class="codewrap">
 <pre>방금 작성한 준비서면에서 인용한 법령 조문과 판결번호를
 korean-law MCP로 전부 재확인하고, 확인 안 되는 인용이 있으면
 표시해줘.</pre>
       <button class="copybtn" onclick="copyCmd(this)">복사</button>
     </div>
-    <div class="tip">💡 판결번호 환각이 가장 큰 위험입니다. 이 [명령 7] 자기검증을 습관화하세요. <b>초안은 AI, 검증은 변호사.</b></div>
+    <div class="tip">💡 판결번호 환각이 가장 큰 위험입니다. 이 [프롬프트 7] 자기검증을 습관화하세요. <b>초안은 AI, 검증은 변호사.</b></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge home">집에서 따라하기</span> 프롬프트 8 · 모의변론으로 제출 전 약점 점검</div>
+    <div class="hint">jurisupport-plugins v0.2.9 기준으로 강화된 mock-hearing 흐름입니다. 단순 말싸움이 아니라 요건사실·입증책임·항변 구조를 다시 세웁니다.</div>
+    <div class="codewrap">
+<pre>jurisupport의 mock-hearing 방식으로 방금 작성한 준비서면을 검토해줘.
+- 청구권규범 카드
+- 요건사실 매트릭스
+- 입증책임 지도
+- 항변·재항변 트리
+- 유리한 판결과 불리한 판결의 유추·구별 메모
+- 제출가능 / 보강 / 재구성 / 출구 중 평결
+- 1~2주 안에 할 수 있는 보강 과제
+를 순서대로 제시해줘.
+근거가 확인되지 않은 부분은 "미확인"이라고 표시하고, 낙관적으로 뭉개지 마.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
   </div>
 
   <!-- ===== 더 해보기 ===== -->
   <h2 class="sec">＋ 더 해보기 (여유 있을 때)</h2>
-  <p class="sec-desc">같은 사건으로 '잘 시키는 법'을 더 연습해 보세요.</p>
+  <p class="sec-desc">같은 사건으로 '잘 부탁하는 법'을 더 연습해 보세요.</p>
 
   <div class="card">
     <div class="label"><span class="badge opt">형식 연습</span> 증거설명서 표 만들기</div>
@@ -278,12 +313,264 @@ korean-law MCP로 전부 재확인하고, 확인 안 되는 인용이 있으면
     </div>
   </div>
 
+  <!-- ===== 실사례 확장 실습 ===== -->
+  <h2 class="sec">실사례 확장 실습 — 사고가 나는 지점 잠그기</h2>
+  <p class="sec-desc">과거 세션에서 실제로 반복된 실패 유형을 바탕으로 만든 추가 프롬프트입니다. 본인 사건에 적용할 때는 A/B, 금액, 문서명을 바꿔 쓰면 됩니다.</p>
+
+  <div class="card do">
+    <div class="label"><span class="badge home">검증</span> 판례 환각 골라내기</div>
+    <div class="hint">AI가 그럴듯한 사건번호를 만들 수 있으므로, "찾은 것"과 "확인한 것"을 분리합니다.</div>
+    <div class="codewrap">
+<pre>방금 네가 인용한 판례를 모두 표로 정리해줘.
+- 열: 사건번호 / 선고일 / 쟁점 / 네가 쓴 법리 / 실제 조회 여부 / 원문 확인 필요 부분
+- 실제로 조회하지 못한 판례는 절대 단정하지 말고 "미확인"이라고 써줘.
+- 주문과 판시사항이 네 설명과 맞는지도 따로 표시해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">구도</span> 발신인·수신인 뒤바뀜 방지</div>
+    <div class="hint">기존 내용증명이나 상대방 문서를 수정할 때 특히 자주 나는 실수입니다.</div>
+    <div class="codewrap">
+<pre>수정 전에 당사자 구도부터 확인해줘.
+- 발신인/작성 주체: A
+- 수신인/상대방: B
+- 우리 입장: B의 채무불이행을 이유로 이행을 촉구한다
+- 유지할 톤: 단정적이되 감정적 표현은 피한다
+위 구도를 표로 먼저 확인한 뒤, 기존 문서에서 이 구도와 어긋나는 문장만 찾아 수정안을 제시해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">금액</span> 견적·신청서 누락 방지</div>
+    <div class="hint">AI가 모르는 금액을 빈칸으로 남기거나 실비·부가세를 빠뜨리는 경우가 많습니다.</div>
+    <div class="codewrap">
+<pre>이 사건 비용 견적을 만들기 전에 체크리스트부터 작성해줘.
+- 변호사보수, 인지대, 송달료, 집행문/확정증명/송달증명, 등기·초본 발급비, 부가세를 빠뜨리지 말 것
+- 사용자가 준 금액과 네가 계산한 금액을 구분할 것
+- 모르는 값은 빈칸으로 두지 말고, 합리적 가정과 산식을 함께 표시할 것
+그다음 누락 자가점검 표를 붙여 견적 초안을 작성해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">편집안전</span> 최신본 덮어쓰기 방지</div>
+    <div class="hint">사람과 AI가 번갈아 편집하면 옛 버전 기준으로 덮어쓰기 쉽습니다.</div>
+    <div class="codewrap">
+<pre>파일을 수정하기 전에 반드시 디스크의 최신본을 다시 읽어줘.
+- 파일명, 수정시각, 전체 구조를 먼저 요약
+- 내가 직접 수정한 문단은 보존
+- 요청받은 부분만 최소 수정
+- 수정 후 변경된 문단과 보존한 문단을 나눠 보고
+- 확실하지 않으면 덮어쓰지 말고 충돌 가능성을 먼저 알려줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">문체</span> LLM 말투 줄이기</div>
+    <div class="hint">전체 재작성보다 마음에 안 드는 문단을 선택해 핀포인트로 고치는 편이 안전합니다.</div>
+    <div class="codewrap">
+<pre>아래 문단을 의미는 유지하면서 준비서면답게 다듬어줘.
+- 과장된 비유, 긴 대시, "중요합니다/핵심입니다" 같은 LLM 말투 금지
+- 화살표나 도식 대신 문장으로 쓸 것
+- 상대방을 불필요하게 자극하는 표현은 낮출 것
+- 수정 이유를 3줄 이내로 설명할 것</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">자산화</span> 내 수정본에서 스타일가이드 뽑기</div>
+    <div class="hint">한 번 잘 고친 문체와 형식을 다음 사건에도 재사용하는 방법입니다.</div>
+    <div class="codewrap">
+<pre>AI 초안과 내가 고친 최종본을 비교해서, 다음 서면에도 재사용할 작성지침을 만들어줘.
+- 증거 인용 방식
+- 날짜와 금액 표기 방식
+- 공격적 표현을 완화한 방식
+- 문단 길이와 제목 스타일
+- 앞으로 금지할 표현
+결과는 "앞으로의 작성 규칙" 10개 이내로 정리해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <!-- ===== 업무별 템플릿 ===== -->
+  <h2 class="sec">집에서 바로 쓰는 업무별 템플릿</h2>
+  <p class="sec-desc">아래 프롬프트는 가상사건이 아니라 실제 내 사건에 붙여 쓰는 용도입니다. 괄호 안의 말만 바꾸면 됩니다.</p>
+
+  <div class="card do">
+    <div class="label"><span class="badge home">표준절차</span> jurisupport brief-protocol로 한 사건 돌리기</div>
+    <div class="hint">바로 초안부터 쓰지 않고, 인테이크·목차승인·인용검증을 통과시키는 방식입니다.</div>
+    <div class="codewrap">
+<pre>jurisupport의 brief-protocol 흐름으로 [사건번호/사건명] 준비서면을 작성하자.
+순서는 다음처럼 진행해줘.
+1. 사건번호, 서면 유형, 제출기한, 특별 지시사항 인테이크
+2. JuriSupport MCP가 있으면 사건 메타를 먼저 확인하고, 없으면 case-index 또는 사건 폴더에서 확인
+3. 사건기록을 읽고 쟁점표와 증거 대응표 작성
+4. legal-books, korean-law, beopgoeul-search 순서로 근거 확인
+5. 본문을 쓰기 전에 목차만 제안하고 내 승인을 기다리기
+6. 승인 후 Markdown 초안 작성
+7. 법령·판결번호·직접인용을 검증 리포트로 따로 점검
+각 단계가 끝나면 다음 단계로 넘어가기 전에 요약하고 멈춰줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card do">
+    <div class="label"><span class="badge home">시작</span> 파일 목록·누락자료 먼저 보기</div>
+    <div class="hint">AI에게 바로 쓰게 하지 말고, 먼저 "무엇을 읽었고 무엇이 없는지"부터 확인합니다.</div>
+    <div class="codewrap">
+<pre>이 사건 폴더를 먼저 훑고, 파일 목록을 표로 정리해줘.
+- 열: 파일명 / 문서 종류 / 작성일 또는 표시일 / 관련 쟁점 / 누락되면 곤란한 정보
+- 아직 읽지 못했거나 OCR이 필요한 파일은 따로 표시해줘.
+- 지금 단계에서는 초안을 쓰지 말고, 사건 파악에 필요한 추가자료 질문 5개만 뽑아줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">근거</span> 법률 리서치 우선순위 지정</div>
+    <div class="hint">근거를 나중에 끼워 맞추지 않도록 정보원 순서를 먼저 고정합니다.</div>
+    <div class="codewrap">
+<pre>아래 쟁점에 대해 결론부터 쓰지 말고 근거조사부터 해줘.
+쟁점: [여기에 쟁점 입력]
+정보원 순서:
+1. legal-books에서 교과서·실무서 근거 확인
+2. korean-law로 현행 조문 확인
+3. beopgoeul-search로 관련 판례 후보 확인
+4. 부족한 부분만 웹 검색
+출력은 결론 / 근거 / 반대논거 / 추가 확인 필요사항으로 나눠줘. 확인 안 된 내용은 단정하지 마.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">목차</span> 초안 쓰기 전 구조 승인받기</div>
+    <div class="hint">바로 초안을 쓰면 방향이 틀렸을 때 고칠 양이 커집니다. 목차에서 한 번 멈추게 하세요.</div>
+    <div class="codewrap">
+<pre>아직 본문을 쓰지 말고 준비서면 목차만 제안해줘.
+- 각 항목마다 목적, 사용할 증거, 필요한 법리, 예상 반박을 붙여줘.
+- 약한 항목은 "약함"이라고 표시하고 보강자료를 제안해줘.
+- 내가 승인하기 전에는 본문 초안을 쓰지 마.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">팩트체크</span> 사실주장 원자료 대조</div>
+    <div class="hint">자백·반성·승인·기망·악의 같은 단어는 반드시 원자료가 있어야 합니다.</div>
+    <div class="codewrap">
+<pre>초안의 사실주장을 모두 점검해줘.
+- 열: 초안 문장 / 근거 파일 또는 호증 / 원문 위치 / 확실·불확실·근거없음 / 수정안
+- 자백, 반성, 승인, 고의, 기망, 악의, 변제 약속 같은 민감한 표현은 특히 엄격하게 봐줘.
+- 근거 없는 문장은 삭제하거나 "주장할 수 있음" 수준으로 낮춰줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">모의변론</span> 상대방·재판부 관점으로 보기</div>
+    <div class="hint">내 편 조언자가 아니라 까다로운 재판부와 상대방 대리인 역할을 시키면 숨은 약점이 잘 나옵니다.</div>
+    <div class="codewrap">
+<pre>이 초안을 jurisupport의 mock-hearing 방식으로 검토해줘.
+일반적인 칭찬은 하지 말고, 다음 순서로 구멍을 찾아줘.
+1. 청구권규범과 요건사실이 맞게 잡혔는지
+2. 각 요건의 입증책임이 누구에게 있는지
+3. 우리 증거가 직접증거인지 정황증거인지
+4. 상대방 항변과 우리의 재항변이 빠진 곳
+5. 유리한 판결과 불리한 판결의 사실관계 차이
+6. 재판부가 물을 석명 질문
+마지막에는 제출가능 / 보강 / 재구성 / 출구 중 하나로 평결해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">사건관리</span> JuriSupport 또는 CSV case-index로 기일 보기</div>
+    <div class="hint">JuriSupport MCP가 없으면 _index.csv 한 파일로도 사건번호·진행단계·다음기일을 관리할 수 있습니다.</div>
+    <div class="codewrap">
+<pre>JuriSupport MCP가 연결되어 있으면 사건 목록에서,
+없으면 case-index의 _index.csv에서 14일 이내 기일이 있는 사건을 찾아줘.
+출력은 사건번호 / 사건명 / 진행단계 / 다음기일 / 오늘 할 일 / 추가 확인 필요사항 표로 정리해줘.
+CSV가 없으면 새로 만들기 전에 어떤 컬럼이 필요한지 먼저 설명해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">실습용</span> OC 키가 없을 때 오프라인 법령 폴백</div>
+    <div class="hint">강의·시연용입니다. 실제 제출 전에는 korean-law 또는 국가법령정보센터로 다시 확인해야 합니다.</div>
+    <div class="codewrap">
+<pre>법제처 OC 키가 아직 없으니, 실습 목적으로 jurisupport의 offline-law-fallback을 사용해
+[확인할 법령과 조문]을 확인해줘.
+답변에는 반드시 "오프라인 스냅샷 기준"이라고 표시하고,
+실제 제출 전에는 korean-law MCP 또는 국가법령정보센터로 재검증해야 한다고 적어줘.
+오프라인 팩에 없는 조문은 추측하지 말고 "오프라인 팩에 없음"이라고 표시해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">모호성</span> "정리해서 올려줘"를 명확한 지시로 바꾸기</div>
+    <div class="hint">형식·위치·파일명이 빠진 지시는 가장 흔한 왕복 원인입니다.</div>
+    <div class="codewrap">
+<pre>내 지시가 모호한지 먼저 점검해줘.
+원래 지시: [여기에 내가 하려던 지시 입력]
+아래 5가지를 채운 명확한 지시문으로 다시 써줘.
+1. 입력자료
+2. 작업범위
+3. 출력형식
+4. 저장위치와 파일명
+5. 검수기준
+그다음 그 지시문대로 작업하면 생길 수 있는 위험도 3개 알려줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">분류</span> 명단·자료 분류 기준 먼저 고정</div>
+    <div class="hint">분류 작업은 기준을 뒤늦게 추가할수록 계속 다시 하게 됩니다.</div>
+    <div class="codewrap">
+<pre>아래 자료를 분류하기 전에 기준표부터 만들어줘.
+분류 대상: [참석자 명단/증거목록/할일 목록 등]
+반드시 정할 기준:
+- 정렬키
+- 포함 기준
+- 제외 기준
+- 정원 또는 컷오프
+- 경계사례 처리 방식
+기준표를 먼저 보여주고, 그 기준으로 분류 결과를 표로 만들어줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="badge opt">반복업무</span> 성공한 절차를 내 템플릿으로 만들기</div>
+    <div class="hint">잘 된 작업은 그 자리에서 규칙으로 뽑아두면 다음 사건부터 시간이 줄어듭니다.</div>
+    <div class="codewrap">
+<pre>방금 성공한 작업 절차를 다음에도 재사용할 수 있는 템플릿으로 정리해줘.
+- 언제 쓰는 템플릿인지
+- 필요한 입력자료
+- 단계별 프롬프트
+- 각 단계의 중단/확인 지점
+- 실패하거나 조심해야 할 엣지케이스
+- 개인정보나 민감자료를 다룰 때의 주의사항
+결과는 "다음 사건에서 그대로 붙여넣을 수 있는 체크리스트" 형태로 작성해줘.</pre>
+      <button class="copybtn" onclick="copyCmd(this)">복사</button>
+    </div>
+  </div>
+
   <!-- ===== 3. 막혔을 때 ===== -->
   <h2 class="sec">막혔을 때</h2>
   <table>
     <tr><th>증상</th><th>해결</th></tr>
     <tr><td>클로드가 파일을 못 읽음</td><td>클로드에게 그대로: <b>"사건파일을 못 읽는 것 같아. 지금 어느 폴더에 있는지 확인하고, 실습사건_세션1_대여금 폴더의 파일들을 읽어줘."</b> (그래도 안 되면 클로드를 끄고 셋업 0-2를 다시 실행)</td></tr>
     <tr><td>Windows 보안 설정으로 설치가 막힘</td><td>README의 <b>Windows에서 PowerShell 한 줄이 막히면</b> 부분을 따라 하고, 설치 선택지에서 <b>S</b>(보안/진단 모드)를 선택하세요. 시간이 없으면 <b>N</b>으로 자료만 받아도 됩니다.</td></tr>
+    <tr><td>법제처 OC 키가 아직 없음</td><td>강의·시연은 <b>offline-law-fallback</b>으로 진행 가능. 다만 실제 제출 전에는 korean-law MCP 또는 국가법령정보센터에서 최신 조문 재검증.</td></tr>
     <tr><td>권한 질문이 계속 나옴</td><td>내용 확인하고 Yes — 가상사건이라 안전합니다</td></tr>
     <tr><td>응답이 중간에 끊김</td><td>"계속해줘" 입력</td></tr>
     <tr><td>한도 초과(rate limit)</td><td>옆자리 화면 같이 보기 + 잠시 후 재시도</td></tr>
@@ -294,22 +581,27 @@ korean-law MCP로 전부 재확인하고, 확인 안 되는 인용이 있으면
   <h2 class="sec">실무 적용 전 반드시 (변호사 책임 영역)</h2>
   <p class="sec-desc">실습은 가상사건이지만, 실제 사건에서는 제출 전 반드시:</p>
   <ol class="steps">
-    <li><b>인용 판결번호 실존 확인</b> — 법고을(lx.scourt.go.kr) 또는 lbox에서 사건번호 직접 검색</li>
+    <li><b>인용 판결번호 실존 확인</b> — beopgoeul-search(법고을, lx.scourt.go.kr) 또는 lbox에서 사건번호 직접 검색</li>
     <li><b>직접인용("…")은 원문과 글자 단위 대조</b></li>
     <li><b>법령 조문번호는 korean-law 또는 law.go.kr로 재확인</b></li>
+    <li><b>당사자·금액·날짜·사건번호</b>는 원자료와 1:1로 대조</li>
+    <li><b>최신 파일 기준인지</b> 확인하고, 사람이 고친 문단을 덮어쓰지 않았는지 점검</li>
+    <li><b>mock-hearing 평결</b>이 보강·재구성·출구이면 초안 단계로 되돌아가기</li>
+    <li><b>법원 전자제출</b>은 자동화하지 않습니다. PDF·정본 준비 후 ecfs 제출은 사용자가 직접 수행</li>
   </ol>
   <div class="realcase">
-    ⚡ <b>실제로 이런 일이 있습니다</b> — 2025. 7. 24. 대법원 전원합의체(2023다240299)가 <b>"시효완성 후 채무승인 = 시효이익 포기로 추정"</b>이라는 수십 년 된 법리를 <b>폐기</b>했습니다(이제는 개별 의사해석으로 판단). 오늘 사건의 피고 항변 ④가 바로 이 쟁점입니다. AI 학습데이터엔 옛 법리가 더 많이 깔려 있을 수 있어, 그대로 받아쓰면 <b>폐기된 법리로 서면을 씁니다.</b> 그래서 현행 판결을 직접 확인하고 [명령 7]로 재검증해야 합니다.
+    ⚡ <b>실제로 이런 일이 있습니다</b> — 2025. 7. 24. 대법원 전원합의체(2023다240299)가 <b>"시효완성 후 채무승인 = 시효이익 포기로 추정"</b>이라는 수십 년 된 법리를 <b>폐기</b>했습니다(이제는 개별 의사해석으로 판단). 오늘 사건의 피고 항변 ④가 바로 이 쟁점입니다. AI 학습데이터엔 옛 법리가 더 많이 깔려 있을 수 있어, 그대로 받아쓰면 <b>폐기된 법리로 서면을 씁니다.</b> 그래서 현행 판결을 직접 확인하고 [프롬프트 7]로 재검증해야 합니다.
   </div>
 
   <!-- ===== 5. 집에 가서 ===== -->
   <h2 class="sec">집에 가서 — 첫 사건 1개</h2>
-  <p class="sec-desc">오늘 흐름을 <b>실제 진행 중인 사건 1개</b>에 그대로 적용해 보세요. 사건 PDF들을 폴더 하나에 모아두고, 그 폴더에서 <code>claude</code>를 실행한 뒤 <b>[명령 1] → [명령 4] → [명령 6] → [명령 7]</b> 순서 그대로.</p>
-  <p class="sec-desc">자세한 안내는 README와 <code>핸드아웃/강의내용_핸드아웃.html</code> / 질문은 단톡방.</p>
+  <p class="sec-desc">오늘 흐름을 <b>실제 진행 중인 사건 1개</b>에 그대로 적용해 보세요. 사건 PDF들을 폴더 하나에 모아두고, 가능하면 <b>legal-terminal에서 사건 폴더를 연 뒤</b> Agent 채팅창에서 <b>brief-protocol → 인용 검증 → mock-hearing → 보강 반영</b> 순서로 돌려보세요. legal-terminal이 없으면 그 폴더에서 <code>claude</code>를 실행하면 됩니다.</p>
+  <p class="sec-desc">자세한 안내는 README와 <code>핸드아웃/강의내용_핸드아웃.html</code> / 질문은 아래 단톡방 링크.</p>
 
   <footer>
-    클로드코드로 송무하기 · 쥬리서포트 · 2026.06.15<br>
-    질문은 단톡방으로 🙋
+    클로드코드로 송무하기 · 쥬리서포트 · 강의 후 보완판 · 2026.06.17<br>
+    JuriSupport: <a href="https://jurisupport.com">https://jurisupport.com</a><br>
+    단톡방: <a href="https://open.kakao.com/o/gj8phZti">https://open.kakao.com/o/gj8phZti</a>
   </footer>
 
 </div>
