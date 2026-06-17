@@ -116,7 +116,7 @@
     <div class="hint">→ 이 표는 Claude Code 안에서 호출하거나 요청하는 도구들입니다. 리걸터미널은 이 표 밖의 <b>작업환경</b>입니다.</div>
   </div>
   <div class="card">
-    <div class="label">🖥️ 리걸터미널은 "일반 터미널"을 편하게 만든 앱</div>
+    <div class="label">🖥️ 리걸터미널은 "일반 터미널"을 편하게 만든 앱 <a href="https://github.com/jurisupport/legal-terminal" target="_blank" rel="noreferrer">GitHub</a></div>
     <table>
       <tr><th>업무</th><th>일반 터미널</th><th>리걸터미널</th></tr>
       <tr><td>시작</td><td><code>cd</code>로 사건 폴더를 찾아가고 <code>claude</code> 실행</td><td>최근 사건·작성서류 폴더·저장된 작업환경에서 선택</td></tr>
@@ -130,7 +130,7 @@
     <div class="hint">※ 내부적으로는 실제 Claude Code를 쓰므로 jurisupport-plugins, korean-law MCP, beopgoeul-search, legal-books 같은 도구는 그대로 작동합니다. 차이는 능력이 아니라 <b>사용 편의성</b>입니다.</div>
   </div>
   <div class="card">
-    <div class="label">⚖️ jurisupport-plugins 최신 흐름 <span style="font-weight:500;color:#64748b">(v0.2.9 기준)</span></div>
+    <div class="label">⚖️ jurisupport-plugins 최신 흐름 <span style="font-weight:500;color:#64748b">(v0.2.9 기준)</span> <a href="https://github.com/jurisupport/jurisupport-plugins" target="_blank" rel="noreferrer">GitHub</a></div>
     <table>
       <tr><th>기능</th><th>무엇을 해주나</th><th>강의에서 설명할 포인트</th></tr>
       <tr><td>cold-start-interview</td><td>사무소명, 호칭, 인용정책, 사건기록·작성문서 경로, CSV 인덱스를 묻고 플레이북을 채움</td><td>처음 한 번만 사무소 업무규칙을 학습시켜 두면 다음 사건부터 반복 설명이 줄어듦</td></tr>
@@ -138,9 +138,16 @@
       <tr><td>mock-hearing</td><td>청구권규범, 요건사실, 입증책임, 항변·재항변, 유리·불리 판결 구별을 점검하고 평결을 냄</td><td>새 버전 핵심. 제출가능/보강/재구성/출구 중 하나로 냉정하게 결론을 냄</td></tr>
       <tr><td>case-index</td><td>JuriSupport가 없을 때도 _index.csv 한 파일로 사건번호·기일·진행단계 관리</td><td>사건관리 SaaS 미사용자도 최소한의 사건 메타데이터를 구조화할 수 있음</td></tr>
       <tr><td>offline-law-fallback</td><td>OC 키가 없거나 네트워크가 막힌 강의·시연에서 주요 법령 전문 스냅샷을 사용</td><td>실습용 폴백일 뿐, 실제 제출 전에는 korean-law 또는 국가법령정보센터 재검증 필요</td></tr>
-      <tr><td>complete-personal-profile</td><td>본인 사건자료·작성서류를 바탕으로 변호사 개인 프로필을 완성</td><td>원자료 자동 업로드·자동 공개가 아니라, 변호사가 읽고 고칠 수 있는 프로필 완성 도구</td></tr>
     </table>
     <div class="hint">※ 정식 호출문법으로 직접 부를 수도 있지만, 수강생에게는 "jurisupport의 모의변론 방식으로 봐줘"처럼 자연어로 말해도 된다고 설명하세요. 단, 법원 전자제출 자체는 자동화 범위가 아니고 사용자가 직접 수행합니다.</div>
+  </div>
+  <div class="card">
+    <div class="label">🧭 별도 프로필 플러그인 <a href="https://github.com/jurisupport/jurisupport-lawyer-profile-plugin" target="_blank" rel="noreferrer">GitHub</a></div>
+    <table>
+      <tr><th>기능</th><th>무엇을 해주나</th><th>강의에서 설명할 포인트</th></tr>
+      <tr><td>complete-personal-profile</td><td>본인 사건자료·작성서류를 바탕으로 변호사 개인 프로필을 완성</td><td>원자료 자동 업로드·자동 공개가 아니라, 변호사가 읽고 고칠 수 있는 프로필 완성 도구</td></tr>
+    </table>
+    <div class="hint">※ 이 기능은 <code>jurisupport-plugins</code> 묶음이 아니라 <code>jurisupport-lawyer-profile-plugin</code>으로 설치하는 별도 플러그인입니다.</div>
   </div>
   <div class="principle"><b>💬 슬래시를 외우는 강의가 아닙니다</b>
     <div class="why">Claude Code에서는 정해진 호출문법을 외우지 않아도 됩니다. "어느 자료원에서, 무엇을, 어떤 형식으로" 찾을지만 말하면 됩니다.</div>
