@@ -688,8 +688,9 @@ function Invoke-PluginBootstrap {
   $tmp = Join-Path ([System.IO.Path]::GetTempPath()) "jurisupport-bootstrap-$([System.Guid]::NewGuid().ToString('N')).ps1"
   try {
     Write-Host "  설치 스크립트를 로컬 임시 파일로 내려받습니다..."
-    Invoke-WebRequest -Uri $bootstrap -OutFile $tmp -UseBasicParsing -Headers (Get-NoCacheHeaders) -ErrorAction Stop
+    Invoke-WebRequest -Uri $bootstrap -OutFile $tmp -UseBasicParsing -Headers (Get-NoCacheHeaders) -TimeoutSec 60 -ErrorAction Stop
     try { Unblock-File -LiteralPath $tmp -ErrorAction SilentlyContinue } catch {}
+    Write-Host "  다운로드 완료. 설치 프로그램을 실행합니다..."
 
     $oldReport = $env:JURISUPPORT_SUPPORT_REPORT
     $oldUpload = $env:JURISUPPORT_SUPPORT_UPLOAD_URL
@@ -700,7 +701,8 @@ function Invoke-PluginBootstrap {
     }
 
     try {
-      & $psExe -NoProfile -ExecutionPolicy Bypass -File $tmp
+      # Callers discard the return value, so send child-process output directly to the host.
+      & $psExe -NoProfile -ExecutionPolicy Bypass -File $tmp | Out-Host
       return ($LASTEXITCODE -eq 0)
     } finally {
       if ($null -eq $oldReport) { Remove-Item Env:\JURISUPPORT_SUPPORT_REPORT -ErrorAction SilentlyContinue } else { $env:JURISUPPORT_SUPPORT_REPORT = $oldReport }
